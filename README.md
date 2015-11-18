@@ -14,6 +14,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+# iottly-device-agent-py
+The *iottly-device-agent-py* repo hosts the python agent which is itended to run on devices to enable them to communicate with Iottly.
+
+We are currently running it on Raspberry Pi, and plan to test it on UDOO and WiPy.
+
+The agent is also shipped as a Docker container so to simplify the development environment.
 
 # Setup instructions
 
