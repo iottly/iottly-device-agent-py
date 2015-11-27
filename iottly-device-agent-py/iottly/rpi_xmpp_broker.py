@@ -20,16 +20,18 @@ limitations under the License.
 import sleekxmpp
 import os,sys
 import logging
+from multiprocessing import Process, Queue
 
-
+msg_queue = Queue()
 
 class RpiIottlyXmppBroker(sleekxmpp.ClientXMPP):
     def __init__(self, jid, password, message_from_broker):
+
         sleekxmpp.ClientXMPP.__init__(self, jid, password)
 
         self.message_from_broker = message_from_broker
 
-        self.add_event_handler("session_start", self.start)
+        self.add_event_handler("session_start", self.session_start)
         self.add_event_handler("message", self.handle_message)
 
         self.use_signals(signals=['SIGHUP', 'SIGTERM', 'SIGINT'])
@@ -42,15 +44,11 @@ class RpiIottlyXmppBroker(sleekxmpp.ClientXMPP):
         # self.ca_certs = None
         self['feature_mechanisms'].unencrypted_plain = True
 
-    def start(self, event):
+
+    def session_start(self, event):
         self.send_presence()
         self.get_roster()
 
-    def send_msg(self, to, msg):
-        logging.info("Sending message %s %s" % (to, msg))
-        self.send_message(mto=to,
-                          mbody=msg,
-                          mtype='chat')
 
     def handle_message(self, msg):
         msg = {
@@ -62,5 +60,42 @@ class RpiIottlyXmppBroker(sleekxmpp.ClientXMPP):
         logging.info(msg)
 
         self.message_from_broker(msg)
+
+
+# This function runs in its own process and dispatches messages in the shared queue
+def message_consumer(xmpp_server, jid, password, handle_message):
+    xmpp = RpiIottlyXmppBroker(jid, 
+                               password, 
+                               handle_message)
+
+
+    # Connect to the XMPP server and start processing XMPP stanzas.
+    if xmpp.connect(xmpp_server, use_ssl=False, use_tls=False):
+        xmpp.process(block=False)
+
+    try:
+        while True:
+            msg_obj = msg_queue.get()
+            if msg_obj is None:
+                logging.info("kill received")
+                break
+            xmpp.send_message(mto=msg_obj['to'], mbody=msg_obj['msg'], mtype='chat')
+    except KeyboardInterrupt:
+        logging.info("exit msg_queue.get()")
+        pass
+
+
+
+def init(xmpp_server, jid, password, handle_message):
+    # Interprocess queue for dispatching xmpp messages
+
+
+    msg_process = Process(target=message_consumer, args=(xmpp_server, jid, password, handle_message))
+    msg_process.name = 'msg_process'
+    msg_process.daemon = True
+    msg_process.start()
+
+    return msg_process
+
 
 

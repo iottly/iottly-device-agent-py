@@ -36,6 +36,15 @@ def main():
         agent.send_msg(msg)
         time.sleep(1)
 
+    def loop2():
+        logging.info('loop2')
+
+        #msg is a dictionary (json):
+        msg = {"timerevent": {"loop1message":2}}
+
+        agent.send_msg(msg)
+        time.sleep(1)
+
 
     #define the callback to receive messages from broker:
     def new_message(msg):
@@ -47,7 +56,7 @@ def main():
     #instantiate the agent passing:
     # - the message callback
     # - a list with the loop functions
-    agent = rpi_agent.RPiIottlyAgent(new_message, [])
+    agent = rpi_agent.RPiIottlyAgent(new_message, [loop1, loop2])
 
     agent.start()
 

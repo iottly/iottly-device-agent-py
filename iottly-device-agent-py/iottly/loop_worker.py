@@ -16,24 +16,37 @@ limitations under the License.
 
 """
 
-import os, sys, threading, time, logging
+import os, sys, time, logging
+from multiprocessing import Process, Value
+from ctypes import c_bool
 
-class LoopWorker(threading.Thread):
+class LoopWorker(Process):
     def __init__(self, loop_func):
-        threading.Thread.__init__(self)
+        Process.__init__(self, daemon=True)
+
+        #self.daemon = True
 
         self.name = loop_func.__name__
 
         self.loop_func = loop_func
-        # A flag to notify the thread that it should finish up and exit
-        self.kill_received = False
+        # A shared flag to notify the thread that it should finish up and exit
+        self.kill_received = Value(c_bool, False)
 
     def run(self):
         logging.info(' starting')
-        while not self.kill_received:
-            self.loop_func()
-        logging.info(' exiting')
+
+        try:    
+            while not self.kill_received.value:
+                self.loop_func()
+            logging.info(' exiting')
+        except KeyboardInterrupt:
+            pass                
 
 
     def kill(self):
-        self.kill_received = True
+        logging.info("closing %s" % self.name)
+        self.kill_received.value = True
+        self.terminate()
+        self.join()
+        logging.info("closed %s" % self.name)
+

@@ -32,13 +32,17 @@ Classes:
 import logging
 import json
 import threading
+import signal
 
 from iottly import loop_worker
-from iottly import rpi_xmpp_broker
+from iottly import rpi_xmpp_broker as rxb
 from iottly import settings
+import multiprocessing
+
 
 logging.basicConfig(level=logging.INFO,
-                      format='[%(levelname)s] (%(threadName)-9s) %(message)s',)
+                      format='%(asctime)s [%(levelname)s] (%(processName)-9s) %(message)s',)
+
 
 class RPiIottlyAgent(object):
     """
@@ -52,6 +56,7 @@ class RPiIottlyAgent(object):
       close
 
     """
+
     def __init__(self, message_from_broker, loops = []):
         """
         constructor for RPiIottlyAgent
@@ -62,13 +67,25 @@ class RPiIottlyAgent(object):
         """
         super(RPiIottlyAgent, self).__init__()
         self.message_from_broker = message_from_broker
+
         self.loops = loops
 
-        self.xmpp = rpi_xmpp_broker.RpiIottlyXmppBroker(settings.JID, 
-                                                               settings.PASSWORD, 
-                                                               self.handle_message)
+        self.loop_worker_processes = []
+
+        
+
+        signal.signal(signal.SIGTERM, self.sig_handler)        
+        signal.signal(signal.SIGINT, self.sig_handler)        
+
+        
+    def sig_handler(self, _signo, _stack_frame):
+        if multiprocessing.current_process().name == 'MainProcess':
+            logging.info("closing")
+            self.close()
+
 
     def handle_message(self, msg):
+        logging.info(msg)
         msg_string = msg["msg"]
         if msg_string.startswith('/json'):
             # decode json message
@@ -97,14 +114,19 @@ class RPiIottlyAgent(object):
         #start loops thread
         for l in self.loops:
             lw = loop_worker.LoopWorker(loop_func=l)
+            self.loop_worker_processes.append(lw)
             lw.start()
-            
-        # start broker thread in blocking mode:
-        # Connect to the XMPP server and start processing XMPP stanzas.
-        if self.xmpp.connect(settings.XMPP_SERVER, use_ssl=False, use_tls=False):
-            self.xmpp.process(block=True)
 
-        self.close()
+
+            
+        self.broker_process = rxb.init(settings.XMPP_SERVER, settings.JID, settings.PASSWORD, self.handle_message)
+
+        try:
+            self.broker_process.join()
+        except KeyboardInterrupt:
+            pass
+
+        
 
     def send_msg(self, msg):
         """
@@ -113,15 +135,20 @@ class RPiIottlyAgent(object):
         it is to be used by client code to send messages
 
         """
-        self.xmpp.send_msg(to=settings.XMPP_SERVER_USER,
-                           msg='/json ' + json.dumps(msg))
+        rxb.msg_queue.put(dict(to=settings.XMPP_SERVER_USER,msg='/json ' + json.dumps(msg)))
 
 
     def close(self):
         """Closes eventually running threads serving the functions in the loops list"""
 
-        for t in threading.enumerate():
-            if type(t) is loop_worker.LoopWorker:
-                t.kill()
+        for lw in self.loop_worker_processes:
+            lw.kill()
 
-        
+        logging.info("Closing Agent")
+        rxb.msg_queue.put(None)
+        logging.info("Agent closed")
+
+    def restart(self):
+        self.close()
+        self.start()
+
