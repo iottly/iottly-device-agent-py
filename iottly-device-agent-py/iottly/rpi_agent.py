@@ -76,12 +76,13 @@ class RPiIottlyAgent(object):
 
         signal.signal(signal.SIGTERM, self.sig_handler)        
         signal.signal(signal.SIGINT, self.sig_handler)        
-
+        signal.signal(signal.SIGSEGV, self.sig_handler)
         
     def sig_handler(self, _signo, _stack_frame):
-        if multiprocessing.current_process().name == 'MainProcess':
-            logging.info("closing")
-            self.close()
+        if _signo in [signal.SIGTERM, signal.SIGINT]:
+            if multiprocessing.current_process().name == 'MainProcess':
+                logging.info("closing")
+                self.close()
 
 
     def handle_message(self, msg):
