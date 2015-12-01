@@ -72,7 +72,7 @@ class RPiIottlyAgent(object):
 
         self.loop_worker_processes = []
 
-        
+        self.msg_queue = multiprocessing.Queue()
 
         signal.signal(signal.SIGTERM, self.sig_handler)        
         signal.signal(signal.SIGINT, self.sig_handler)        
@@ -119,12 +119,9 @@ class RPiIottlyAgent(object):
 
 
             
-        self.broker_process = rxb.init(settings.XMPP_SERVER, settings.JID, settings.PASSWORD, self.handle_message)
+        self.broker_process = rxb.init(settings.XMPP_SERVER, settings.JID, settings.PASSWORD, self.handle_message, self.msg_queue)
 
-        try:
-            self.broker_process.join()
-        except KeyboardInterrupt:
-            pass
+        self.broker_process.join()
 
         
 
@@ -135,7 +132,7 @@ class RPiIottlyAgent(object):
         it is to be used by client code to send messages
 
         """
-        rxb.msg_queue.put(dict(to=settings.XMPP_SERVER_USER,msg='/json ' + json.dumps(msg)))
+        self.msg_queue.put(dict(to=settings.XMPP_SERVER_USER,msg='/json ' + json.dumps(msg)))
 
 
     def close(self):
@@ -145,7 +142,8 @@ class RPiIottlyAgent(object):
             lw.kill()
 
         logging.info("Closing Agent")
-        rxb.msg_queue.put(None)
+        self.msg_queue.put(None)
+        self.broker_process.join()
         logging.info("Agent closed")
 
     def restart(self):

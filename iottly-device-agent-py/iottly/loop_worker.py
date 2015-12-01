@@ -35,12 +35,9 @@ class LoopWorker(Process):
     def run(self):
         logging.info(' starting')
 
-        try:    
-            while not self.kill_received.value:
-                self.loop_func()
-            logging.info(' exiting')
-        except KeyboardInterrupt:
-            pass                
+        while not self.kill_received.value:
+            self.loop_func()
+        logging.info(' exiting')
 
 
     def kill(self):
