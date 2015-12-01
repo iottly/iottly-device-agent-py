@@ -34,7 +34,7 @@ class RpiIottlyXmppBroker(sleekxmpp.ClientXMPP):
         self.add_event_handler("session_start", self.session_start)
         self.add_event_handler("message", self.handle_message)
 
-        self.use_signals(signals=['SIGHUP', 'SIGTERM', 'SIGINT'])
+        #self.use_signals(signals=['SIGHUP', 'SIGTERM', 'SIGINT'])
         self.register_plugin('xep_0030') # Service Discovery
         self.register_plugin('xep_0199') # XMPP Ping
 
@@ -77,6 +77,7 @@ def message_consumer(xmpp_server, jid, password, handle_message, msg_queue):
         msg_obj = msg_queue.get()
         if msg_obj is None:
             logging.info("kill received")
+            xmpp.disconnect(wait=True)
             break
         xmpp.send_message(mto=msg_obj['to'], mbody=msg_obj['msg'], mtype='chat')
 
