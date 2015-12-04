@@ -22,6 +22,7 @@ import logging
 
 from iottly import rpi_agent
 
+
 def main():
 
 
