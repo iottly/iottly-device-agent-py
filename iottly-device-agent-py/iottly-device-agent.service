@@ -1,0 +1,12 @@
+# put this in sudo nano /lib/systemd/system/myscript.service
+
+Description=Iottly Agent
+After=network.target multi-user.target
+
+[Service]
+Type=idle
+Restart=always
+ExecStart=/usr/bin/python3.4 /home/pi/iottly-device-agent-py/iottly-device-agent-py/main.py
+
+[Install]
+WantedBy=multi-user.target
