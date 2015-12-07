@@ -6,7 +6,7 @@ After=network.target multi-user.target
 [Service]
 Type=idle
 Restart=always
-ExecStart=/usr/bin/python3.4 /home/pi/iottly-device-agent-py/iottly-device-agent-py/main.py
+ExecStart=/usr/bin/python3.4 /home/pi/iottly-device-agent-py/iottly-device-agent-py/main.py > /var/log/iottly-device-agent-py.log 2>&1
 
 [Install]
 WantedBy=multi-user.target
