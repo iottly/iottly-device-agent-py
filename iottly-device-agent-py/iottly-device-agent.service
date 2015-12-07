@@ -1,4 +1,8 @@
 # put this in sudo nano /lib/systemd/system/iottly-device-agent.service
+# sudo chmod 644 /lib/systemd/system/iottly-device-agent.service
+# sudo systemctl daemon-reload
+# sudo systemctl enable iottly-device-agent.service
+
 
 Description=Iottly Agent
 After=network.target multi-user.target
@@ -6,7 +10,7 @@ After=network.target multi-user.target
 [Service]
 Type=idle
 Restart=always
-ExecStart=/usr/bin/python3.4 /home/pi/iottly-device-agent-py/iottly-device-agent-py/main.py > /var/log/iottly-device-agent-py.log 2>&1
+ExecStart=exec stdbuf -oL -eL /usr/bin/python3.4 /home/pi/iottly-device-agent-py/iottly-device-agent-py/main.py > /var/log/iottly-device-agent-py.log 2>&1
 
 [Install]
 WantedBy=multi-user.target
