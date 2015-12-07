@@ -52,6 +52,9 @@ def main():
         #received message is a dictionary
         logging.info(msg)
         agent.send_msg(msg)
+        if "ECHO" in msg.keys():
+            agent.close()
+
 
 
     #instantiate the agent passing:
