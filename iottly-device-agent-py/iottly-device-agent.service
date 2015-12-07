@@ -1,4 +1,4 @@
-# put this in sudo nano /lib/systemd/system/myscript.service
+# put this in sudo nano /lib/systemd/system/iottly-device-agent.service
 
 Description=Iottly Agent
 After=network.target multi-user.target
