@@ -11,6 +11,8 @@ After=network.target multi-user.target
 Type=idle
 Restart=always
 ExecStart=/usr/bin/python3.4 /home/pi/iottly-device-agent-py/iottly-device-agent-py/main.py
+StandardOutput=syslog+console
+StandardError=syslog+console
 
 [Install]
 WantedBy=multi-user.target
