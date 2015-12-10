@@ -36,7 +36,11 @@ class LoopWorker(Process):
         logging.info(' starting')
 
         while not self.kill_received.value:
-            self.loop_func()
+            try:
+                self.loop_func()
+            except Exception as ex:
+                #FIXME: add here debug message to be sent to iottly-core
+                logging.error(ex)
         logging.info(' exiting')
 
 
