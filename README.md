@@ -69,10 +69,10 @@ The following instructions have been tested on the [raspbian jessie LITE](https:
 
 ### clone iottly-device-agent-py repo:
   - `git clone https://github.com/iottly/iottly-device-agent-py.git`
-  - `cd iottly-device-agent-py`
+  - `cd iottly-device-agent-py/iottly-device-agent-py` (yes, twice)
 
 ### install iottly requirements:
-  - `sudo pip3.4 install -r iottly-device-agent-py/requirements.txt`
+  - `sudo pip3.4 install -r requirements.txt`
 
 ### install service:
   - `./install-service.sh`
