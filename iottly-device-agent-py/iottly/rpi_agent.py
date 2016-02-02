@@ -66,6 +66,9 @@ class RPiIottlyAgent(object):
 
         """
         super(RPiIottlyAgent, self).__init__()
+
+        self.broker_process = None
+
         self.message_from_broker = message_from_broker
 
         self.loops = loops
@@ -144,7 +147,8 @@ class RPiIottlyAgent(object):
 
         logging.info("Closing Agent")
         self.msg_queue.put(None)
-        self.broker_process.join()
+        if self.broker_process:
+            self.broker_process.join()
         logging.info("Agent closed")
 
     def restart(self):

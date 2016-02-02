@@ -48,6 +48,7 @@ class LoopWorker(Process):
         logging.info("closing %s" % self.name)
         self.kill_received.value = True
         self.terminate()
-        self.join()
+        if self._parent_pid == os.getpid():
+            self.join()
         logging.info("closed %s" % self.name)
 
