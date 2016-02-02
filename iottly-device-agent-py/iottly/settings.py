@@ -20,6 +20,6 @@ XMPP_SERVER = ('iottlydocker_xmppbroker_1', 5222)
 XMPP_SERVER_USER = 'iottlycore@xmppbroker.localdev.iottly.org'
 
 
-JID = 'raspdev.0001@xmppbroker.localdev.iottly.org/IB'
+JID = 'raspdev.0001@xmppbroker.localdev.iottly.org'
 PASSWORD = 'raspdev.0001'
 CHUNK_SIZE = 1024

@@ -123,7 +123,7 @@ class RPiIottlyAgent(object):
 
 
             
-        self.broker_process = rxb.init(settings.XMPP_SERVER, settings.JID, settings.PASSWORD, self.handle_message, self.msg_queue)
+        self.broker_process = rxb.init(settings.XMPP_SERVER, settings.JID + '/IB', settings.PASSWORD, self.handle_message, self.msg_queue)
 
         self.broker_process.join()
 
