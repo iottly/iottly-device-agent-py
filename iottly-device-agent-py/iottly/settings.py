@@ -16,7 +16,7 @@ limitations under the License.
 
 """
 
-XMPP_SERVER = ('iottlydocker_xmppbroker_1', 5222)
+XMPP_SERVER = ('xmppbroker', 5222)
 XMPP_SERVER_USER = 'iottlycore@xmppbroker.localdev.iottly.org'
 
 
