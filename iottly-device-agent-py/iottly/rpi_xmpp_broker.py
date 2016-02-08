@@ -19,6 +19,7 @@ limitations under the License.
 
 import sleekxmpp
 import os,sys
+import time
 import logging
 from multiprocessing import Process, Queue
 
@@ -70,16 +71,19 @@ def message_consumer(xmpp_server, jid, password, handle_message, msg_queue):
 
 
     # Connect to the XMPP server and start processing XMPP stanzas.
-    if xmpp.connect(xmpp_server, use_ssl=False, use_tls=False):
+    if xmpp.connect(xmpp_server, reattempt=False, use_ssl=False, use_tls=False):
         xmpp.process(block=False)
 
-    while True:
-        msg_obj = msg_queue.get()
-        if msg_obj is None:
-            logging.info("kill received")
-            xmpp.disconnect(wait=True)
-            break
-        xmpp.send_message(mto=msg_obj['to'], mbody=msg_obj['msg'], mtype='chat')
+        while True:
+            msg_obj = msg_queue.get()
+            if msg_obj is None:
+                logging.info("kill received")
+                xmpp.disconnect(wait=True)
+                break
+            xmpp.send_message(mto=msg_obj['to'], mbody=msg_obj['msg'], mtype='chat')
+    else:
+        logging.info("no connection to %s" % str(xmpp_server))
+
 
 
 
