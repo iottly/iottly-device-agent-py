@@ -23,7 +23,9 @@ import time
 import logging
 from multiprocessing import Process, Queue
 
-
+CONNECTED = 'Connected'
+NOROUTETOHOST = 'NoRouteToHost'
+PARAMERROR = 'ParamError'
 
 class RpiIottlyXmppBroker(sleekxmpp.ClientXMPP):
     def __init__(self, jid, password, message_from_broker):
@@ -64,34 +66,43 @@ class RpiIottlyXmppBroker(sleekxmpp.ClientXMPP):
 
 
 # This function runs in its own process and dispatches messages in the shared queue
-def message_consumer(xmpp_server, jid, password, handle_message, msg_queue):
-    xmpp = RpiIottlyXmppBroker(jid, 
-                               password, 
-                               handle_message)
+def message_consumer(xmpp_server, jid, password, handle_message, msg_queue, child_conn):
+    try:
+        xmpp = RpiIottlyXmppBroker(jid, 
+                                   password, 
+                                   handle_message)
 
 
-    # Connect to the XMPP server and start processing XMPP stanzas.
-    if xmpp.connect(xmpp_server, reattempt=False, use_ssl=False, use_tls=False):
-        xmpp.process(block=False)
+        # Connect to the XMPP server and start processing XMPP stanzas.
+    
+        if xmpp.connect(xmpp_server, reattempt=False, use_ssl=False, use_tls=False):
+            xmpp.process(block=False)
+            child_conn.send(CONNECTED)
 
-        while True:
-            msg_obj = msg_queue.get()
-            if msg_obj is None:
-                logging.info("kill received")
-                xmpp.disconnect(wait=True)
-                break
-            xmpp.send_message(mto=msg_obj['to'], mbody=msg_obj['msg'], mtype='chat')
-    else:
-        logging.info("no connection to %s" % str(xmpp_server))
+            while True:
+                msg_obj = msg_queue.get()
+                if msg_obj is None:
+                    logging.info("kill received")
+                    xmpp.disconnect(wait=True)
+                    break
+                xmpp.send_message(mto=msg_obj['to'], mbody=msg_obj['msg'], mtype='chat')
+        else:
+            logging.info("no connection to %s" % str(xmpp_server))
+            child_conn.send(NOROUTETOHOST)
+            
+
+    except Exception as e:
+        logging.info(e)
+        child_conn.send(PARAMERROR)
+        
 
 
 
-
-def init(xmpp_server, jid, password, handle_message, msg_queue):
+def init(xmpp_server, jid, password, handle_message, msg_queue, child_conn):
     # Interprocess queue for dispatching xmpp messages
 
 
-    msg_process = Process(target=message_consumer, args=(xmpp_server, jid, password, handle_message, msg_queue))
+    msg_process = Process(target=message_consumer, args=(xmpp_server, jid, password, handle_message, msg_queue, child_conn))
     msg_process.name = 'msg_process'
     msg_process.daemon = True
     msg_process.start()

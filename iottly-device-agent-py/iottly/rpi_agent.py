@@ -104,6 +104,19 @@ class RPiIottlyAgent(object):
         else:
             logging.info("bad message: %s" % msg)
 
+
+    def connectionstatuschanged(self, status):
+        if status == rxb.CONNECTED:
+            #start loops thread
+            for l in self.loops:
+                lw = loop_worker.LoopWorker(loop_func=l)
+                self.loop_worker_processes.append(lw)
+                lw.start()            
+        elif status == rxb.NOROUTETOHOST:
+            self.close()
+        elif status == rxb.PARAMERROR:
+            logging.info('Ask for params')
+
     def start(self):
         """
 
@@ -113,19 +126,19 @@ class RPiIottlyAgent(object):
         xmpp communication is then started in blocking mode
 
         """
-        
 
-        #start loops thread
-        for l in self.loops:
-            lw = loop_worker.LoopWorker(loop_func=l)
-            self.loop_worker_processes.append(lw)
-            lw.start()
+        child_conn, parent_conn = multiprocessing.Pipe()
 
+        try:
+            self.broker_process = rxb.init(settings.XMPP_SERVER, settings.JID + '/IB', settings.PASSWORD, self.handle_message, self.msg_queue, child_conn)
+        except:
+            child_conn.send(rxb.PARAMERROR)
 
-            
-        self.broker_process = rxb.init(settings.XMPP_SERVER, settings.JID + '/IB', settings.PASSWORD, self.handle_message, self.msg_queue)
+        self.connectionstatuschanged(parent_conn.recv())
 
-        self.broker_process.join()
+        if self.broker_process:
+            self.broker_process.join()
+
 
         
 
