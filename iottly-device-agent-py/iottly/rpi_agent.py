@@ -33,7 +33,10 @@ import logging
 import json
 import threading
 import signal
+import http.client
 
+
+from iottly import network
 from iottly import loop_worker
 from iottly import rpi_xmpp_broker as rxb
 from iottly import settings
@@ -116,6 +119,16 @@ class RPiIottlyAgent(object):
             self.close()
         elif status == rxb.PARAMERROR:
             logging.info('Ask for params')
+
+            mac = network.getHwAddr('eth0')
+            logging.info('device mac: %s' % mac)
+            connection = http.client.HTTPConnection(settings.REGISTRATION_HOST)
+
+            connection.request('GET', '%s/%s' % (settings.REGISTRATION_SERVICE, mac))
+
+            response = connection.getresponse()
+            logging.info(response.read().decode())
+            
 
     def start(self):
         """

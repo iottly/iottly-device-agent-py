@@ -15,21 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 """
-default_settings = {
+import fcntl, socket, struct
 
-    'REGISTRATION_HOST': 'iottlycore:8520',
-    'REGISTRATION_SERVICE': '/project/56c48d3cc9e741000dbc35f5/deviceregistration',
-    'XMPP_SERVER_HOST': 'xmppbroker',
-    'XMPP_SERVER_PORT': 5222,
-    'XMPP_SERVER_USER': '',
-    'JID': '',
-    'PASSWORD': '',
-    'CHUNK_SIZE': 1024    
-}
-
-
-class Settings:
-    def __init__(self, **entries): 
-        self.__dict__.update(entries)
-
-settings = Settings(**default_settings)
+def getHwAddr(ifname):
+    #adapted from https://gist.github.com/zhenyi2697/6080400
+    #to python 3.x
+    b = bytearray()
+    b.extend(map(ord, ifname[:15]))
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    info = fcntl.ioctl(s.fileno(), 0x8927,  struct.pack('256s', b))
+    return ':'.join('{:02x}'.format(x) for x in info[18:24])
