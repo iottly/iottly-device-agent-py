@@ -42,23 +42,29 @@ class Settings:
         #set defaults
         self.__dict__.update(self.defaults)
 
-
         #override from settings.json file
         try:
             with open(self.filename, 'r') as f:
                 settings = json.loads(f.read())
                 self.__dict__.update(settings)
-        except:
-            pass
+        except Exception as e:
+            logging.error(e)
 
         #override from env variables:
         self.__dict__.update({k: os.environ[k] for k in os.environ.keys() if k in self.defaults.keys()})
 
-        logging.info(json.dumps({k: self.__dict__[k] for k in self.defaults.keys()},
-                sort_keys=True, indent=4, separators=(',', ': ')))
+        logging.info(str(self))
 
+    def __str__(self):
+        return json.dumps({k: self.__dict__[k] for k in self.defaults.keys()},
+                sort_keys=True, indent=4, separators=(',', ': '))
+
+    def update(self, settings):
+        self.__dict__.update({k: settings[k] for k in settings.keys() if k in self.defaults.keys()})
+        self.save()
+        logging.info("updated")
+        logging.info(str(self))        
 
     def save(self):
         with open(self.filename, 'w') as f:
-            f.write(json.dumps({k: self.__dict__[k] for k in self.defaults.keys()},
-                sort_keys=True, indent=4, separators=(',', ': ')))
+            f.write(str(self))

@@ -34,7 +34,8 @@ import json
 import threading
 import signal
 import http.client
-
+import sys
+import traceback
 
 from iottly import network
 from iottly import loop_worker
@@ -119,16 +120,27 @@ class RPiIottlyAgent(object):
         elif status == rxb.NOROUTETOHOST:
             self.close()
         elif status == rxb.PARAMERROR:
-            logging.info('Ask for params')
+            logging.info('Ask for params to {}'.format(settings.IOTTLY_REGISTRATION_SERVICE))
 
-            mac = network.getHwAddr('eth0')
-            logging.info('device mac: %s' % mac)
-            connection = http.client.HTTPConnection(settings.IOTTLY_REGISTRATION_HOST)
+            try:
+                mac = network.getHwAddr('eth0')
+                logging.info('device mac: {}'.format(mac))
+                connection = http.client.HTTPConnection(settings.IOTTLY_REGISTRATION_HOST)
 
-            connection.request('GET', '%s/%s' % (settings.IOTTLY_REGISTRATION_SERVICE, mac))
+                reg_url = '{}/{}'.format(settings.IOTTLY_REGISTRATION_SERVICE, mac)
+                logging.info(reg_url)
+                connection.request('GET', reg_url)
 
-            response = connection.getresponse()
-            logging.info(response.read().decode())
+                response = json.loads(connection.getresponse().read().decode())
+                if 'error' in response.keys():
+                    raise Exception(response['error'])
+
+                settings.update(response)
+                self.start()
+            except Exception as e:
+                logging.info(e)
+                traceback.print_exception(sys.exc_info())
+                logging.info('Error retrieving params from IOTTLY')            
             
 
     def start(self):
