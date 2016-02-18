@@ -39,13 +39,14 @@ import http.client
 from iottly import network
 from iottly import loop_worker
 from iottly import rpi_xmpp_broker as rxb
-from iottly import settings
+from iottly.settings import Settings
 import multiprocessing
 
 
 logging.basicConfig(level=logging.INFO,
                       format='%(asctime)s [%(levelname)s] (%(processName)-9s) %(message)s',)
 
+settings = Settings('./settings.json')
 
 class RPiIottlyAgent(object):
     """
@@ -122,9 +123,9 @@ class RPiIottlyAgent(object):
 
             mac = network.getHwAddr('eth0')
             logging.info('device mac: %s' % mac)
-            connection = http.client.HTTPConnection(settings.REGISTRATION_HOST)
+            connection = http.client.HTTPConnection(settings.IOTTLY_REGISTRATION_HOST)
 
-            connection.request('GET', '%s/%s' % (settings.REGISTRATION_SERVICE, mac))
+            connection.request('GET', '%s/%s' % (settings.IOTTLY_REGISTRATION_SERVICE, mac))
 
             response = connection.getresponse()
             logging.info(response.read().decode())
@@ -143,7 +144,13 @@ class RPiIottlyAgent(object):
         child_conn, parent_conn = multiprocessing.Pipe()
 
         try:
-            self.broker_process = rxb.init(settings.XMPP_SERVER, settings.JID + '/IB', settings.PASSWORD, self.handle_message, self.msg_queue, child_conn)
+            self.broker_process = rxb.init(
+                (settings.IOTTLY_XMPP_SERVER_HOST, settings.IOTTLY_XMPP_SERVER_PORT),
+                settings.IOTTLY_XMPP_DEVICE_USER + '/IB', 
+                settings.IOTTLY_XMPP_DEVICE_PASSWORD, 
+                self.handle_message, 
+                self.msg_queue, child_conn)
+
         except:
             child_conn.send(rxb.PARAMERROR)
 
@@ -162,7 +169,7 @@ class RPiIottlyAgent(object):
         it is to be used by client code to send messages
 
         """
-        self.msg_queue.put(dict(to=settings.XMPP_SERVER_USER,msg='/json ' + json.dumps(msg)))
+        self.msg_queue.put(dict(to=settings.IOTTLY_XMPP_SERVER_USER,msg='/json ' + json.dumps(msg)))
 
 
     def close(self):
