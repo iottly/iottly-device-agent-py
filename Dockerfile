@@ -30,4 +30,8 @@ RUN python3.4 -m pip install -r /iottly-device-agent-py/requirements.txt
 
 ENV TERM xterm
 
+ADD /iottly-device-agent-py /iottly-device-agent-py/iottly-device-agent-py
+
 WORKDIR /iottly-device-agent-py/iottly-device-agent-py
+
+CMD ["python3.4", "main.py"] 

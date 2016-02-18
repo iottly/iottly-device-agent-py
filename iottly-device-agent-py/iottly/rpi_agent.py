@@ -34,8 +34,6 @@ import json
 import threading
 import signal
 import http.client
-import sys
-import traceback
 
 from iottly import network
 from iottly import loop_worker
@@ -139,7 +137,6 @@ class RPiIottlyAgent(object):
                 self.start()
             except Exception as e:
                 logging.info(e)
-                traceback.print_exception(sys.exc_info())
                 logging.info('Error retrieving params from IOTTLY')            
             
 
