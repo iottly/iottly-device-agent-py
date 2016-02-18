@@ -24,7 +24,7 @@ class LoopWorker(Process):
     def __init__(self, loop_func):
         Process.__init__(self, daemon=True)
 
-        #self.daemon = True
+        self.daemon = True
 
         self.name = loop_func.__name__
 
@@ -48,7 +48,7 @@ class LoopWorker(Process):
         logging.info("closing %s" % self.name)
         self.kill_received.value = True
         self.terminate()
-        if self._parent_pid == os.getpid():
-            self.join()
+        #if self._parent_pid == os.getpid():
+        self.join()
         logging.info("closed %s" % self.name)
 

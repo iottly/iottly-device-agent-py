@@ -60,8 +60,6 @@ class RpiIottlyXmppBroker(sleekxmpp.ClientXMPP):
             'msg': msg['body']
         }
 
-        logging.info(msg)
-
         self.message_from_broker(msg)
 
 

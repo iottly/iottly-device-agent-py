@@ -76,8 +76,7 @@ class RPiIottlyAgent(object):
 
         self.loops = loops
 
-        self.loop_worker_processes = []
-
+        self.child_conn, self.parent_conn = multiprocessing.Pipe()
         self.msg_queue = multiprocessing.Queue()
 
         signal.signal(signal.SIGTERM, self.sig_handler)        
@@ -113,7 +112,6 @@ class RPiIottlyAgent(object):
             #start loops thread
             for l in self.loops:
                 lw = loop_worker.LoopWorker(loop_func=l)
-                self.loop_worker_processes.append(lw)
                 lw.start()            
         elif status == rxb.NOROUTETOHOST:
             self.close()
@@ -150,7 +148,7 @@ class RPiIottlyAgent(object):
 
         """
 
-        child_conn, parent_conn = multiprocessing.Pipe()
+        
 
         try:
             self.broker_process = rxb.init(
@@ -158,17 +156,17 @@ class RPiIottlyAgent(object):
                 settings.IOTTLY_XMPP_DEVICE_USER + '/IB', 
                 settings.IOTTLY_XMPP_DEVICE_PASSWORD, 
                 self.handle_message, 
-                self.msg_queue, child_conn)
+                self.msg_queue, self.child_conn)
 
         except:
-            child_conn.send(rxb.PARAMERROR)
+            self.child_conn.send(rxb.PARAMERROR)
 
-        self.connectionstatuschanged(parent_conn.recv())
+        self.connectionstatuschanged(self.parent_conn.recv())
 
-        if self.broker_process:
-            self.broker_process.join()
-
-
+        if multiprocessing.current_process().name == 'MainProcess':
+            # this is the blocking action on which the main process waits forever
+            if self.parent_conn.recv() == "close":
+                self._close()
         
 
     def send_msg(self, msg):
@@ -182,10 +180,30 @@ class RPiIottlyAgent(object):
 
 
     def close(self):
+        # close kills all the child processes
+        # after having killed them it joins on each to wait for the child to really exit
+        # in a multiprocess app child processes can't join other child process
+        # only the parent process can join on its children
+        # BUT if the close command is incoming from a broker message (a command from iottly)
+        # then the execution process for the close is the msg_process which is itself a child
+        # and hence not able to join on each of the other children
+
+        # SO: the close command is enqueued to the parent process so that it can join 
+        # the children
+
+        self.child_conn.send("close")
+
+
+
+    def _close(self):
         """Closes eventually running threads serving the functions in the loops list"""
 
-        for lw in self.loop_worker_processes:
-            lw.kill()
+        #to kill children loop over native children list
+        #DO NOT create a custom process list
+        #since terminated processes don't get correctly garbage collected
+        for lw in multiprocessing.active_children():
+            if type(lw) == loop_worker.LoopWorker:
+                lw.kill()
 
         logging.info("Closing Agent")
         self.msg_queue.put(None)
