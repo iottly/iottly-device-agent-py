@@ -111,7 +111,7 @@ class RPiIottlyAgent(object):
         if status == rxb.CONNECTED:
             #start loops thread
             for l in self.loops:
-                lw = loop_worker.LoopWorker(loop_func=l)
+                lw = loop_worker.LoopWorker(loop_func=l, send_msg=self.send_msg)
                 lw.start()            
         elif status == rxb.NOROUTETOHOST:
             self.close()

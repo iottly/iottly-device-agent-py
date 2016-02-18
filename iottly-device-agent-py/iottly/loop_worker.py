@@ -21,7 +21,7 @@ from multiprocessing import Process, Value
 from ctypes import c_bool
 
 class LoopWorker(Process):
-    def __init__(self, loop_func):
+    def __init__(self, loop_func, send_msg):
         Process.__init__(self, daemon=True)
 
         self.daemon = True
@@ -29,11 +29,14 @@ class LoopWorker(Process):
         self.name = loop_func.__name__
 
         self.loop_func = loop_func
+        self.send_msg = send_msg
+
         # A shared flag to notify the thread that it should finish up and exit
         self.kill_received = Value(c_bool, False)
 
     def run(self):
         logging.info(' starting')
+        self.send_msg({'process': {'name': self.name, 'status': 'started'}})
 
         while not self.kill_received.value:
             try:
@@ -41,14 +44,17 @@ class LoopWorker(Process):
             except Exception as ex:
                 #FIXME: add here debug message to be sent to iottly-core
                 logging.error(ex)
+                self.send_msg({'process': {'name': self.name, 'status': {'error': str(ex)}}})
+                self.kill()
         logging.info(' exiting')
 
 
     def kill(self):
         logging.info("closing %s" % self.name)
+        self.send_msg({'process': {'name': self.name, 'status': 'terminated'}})
         self.kill_received.value = True
-        self.terminate()
-        #if self._parent_pid == os.getpid():
-        self.join()
+        if self._parent_pid == os.getpid():
+            self.terminate()
+            self.join()
         logging.info("closed %s" % self.name)
 

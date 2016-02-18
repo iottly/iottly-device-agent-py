@@ -37,6 +37,7 @@ class RpiIottlyXmppBroker(sleekxmpp.ClientXMPP):
         self.add_event_handler("session_start", self.session_start)
         self.add_event_handler("message", self.handle_message)
 
+        # SIGs are managed from the agent
         #self.use_signals(signals=['SIGHUP', 'SIGTERM', 'SIGINT'])
         self.register_plugin('xep_0030') # Service Discovery
         self.register_plugin('xep_0199') # XMPP Ping
