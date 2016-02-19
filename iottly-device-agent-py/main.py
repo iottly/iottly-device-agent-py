@@ -31,6 +31,7 @@ def main():
     def loop1():
         logging.info('loop1')
 
+        #a = 1/0
         #msg is a dictionary (json):
         msg = {"timerevent": {"loop1message":1}}
 
@@ -60,7 +61,7 @@ def main():
     #instantiate the agent passing:
     # - the message callback
     # - a list with the loop functions
-    agent = rpi_agent.RPiIottlyAgent(new_message, [loop1, loop2])
+    agent = rpi_agent.RPiIottlyAgent(new_message, [loop1])
 
     agent.start()
 

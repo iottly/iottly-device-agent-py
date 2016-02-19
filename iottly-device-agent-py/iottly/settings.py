@@ -16,55 +16,21 @@ limitations under the License.
 
 """
 
-import os
-import json
-import logging
+import prettysettings
 
-class Settings:
+defaults = {
 
-    defaults = {
-
-        'IOTTLY_REGISTRATION_HOST': '',
-        'IOTTLY_REGISTRATION_SERVICE': '',
-        'IOTTLY_XMPP_SERVER_HOST': '',
-        'IOTTLY_XMPP_SERVER_PORT': 0,
-        'IOTTLY_XMPP_SERVER_USER': '',
-        'IOTTLY_XMPP_DEVICE_USER': '',
-        'IOTTLY_XMPP_DEVICE_PASSWORD': '',
-        'IOTTLY_CHUNK_SIZE': 1024    
-    }
+    'IOTTLY_REGISTRATION_HOST': '',
+    'IOTTLY_REGISTRATION_SERVICE': '',
+    'IOTTLY_XMPP_SERVER_HOST': '',
+    'IOTTLY_XMPP_SERVER_PORT': 0,
+    'IOTTLY_XMPP_SERVER_USER': '',
+    'IOTTLY_XMPP_DEVICE_USER': '',
+    'IOTTLY_XMPP_DEVICE_PASSWORD': '',
+    'IOTTLY_CHUNK_SIZE': 1024    
+}
 
 
+def Settings():
+    return prettysettings.Settings(defaults, './settings.json')
 
-    def __init__(self, filename): 
-
-        self.filename = filename
-        #set defaults
-        self.__dict__.update(self.defaults)
-
-        #override from settings.json file
-        try:
-            with open(self.filename, 'r') as f:
-                settings = json.loads(f.read())
-                self.__dict__.update(settings)
-        except Exception as e:
-            logging.error(e)
-
-        #override from env variables:
-        self.__dict__.update({k: os.environ[k] for k in os.environ.keys() if k in self.defaults.keys()})
-
-        logging.info(str(self))
-
-    def __str__(self):
-        return json.dumps({k: self.__dict__[k] for k in self.defaults.keys()},
-                sort_keys=True, indent=4, separators=(',', ': '))
-
-    def update(self, settings):
-        self.__dict__.update({k: settings[k] for k in settings.keys() if k in self.defaults.keys()})
-        self.save()
-        logging.info("updated")
-        logging.info(str(self))        
-
-    def save(self):
-        with open(self.filename, 'w') as f:
-            f.write(str(self))

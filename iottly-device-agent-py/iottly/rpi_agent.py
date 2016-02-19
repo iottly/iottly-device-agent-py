@@ -38,14 +38,14 @@ import http.client
 from iottly import network
 from iottly import loop_worker
 from iottly import rpi_xmpp_broker as rxb
-from iottly.settings import Settings
+from iottly import settings
 import multiprocessing
 
 
 logging.basicConfig(level=logging.INFO,
                       format='%(asctime)s [%(levelname)s] (%(processName)-9s) %(message)s',)
 
-settings = Settings('./settings.json')
+settings = settings.Settings()
 
 class RPiIottlyAgent(object):
     """
