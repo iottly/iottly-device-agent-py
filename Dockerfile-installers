@@ -1,0 +1,6 @@
+FROM ubuntu:latest
+MAINTAINER iottly
+
+
+RUN mkdir /iottly-device-agent-py-installers
+ADD /iottly-device-agent-py-installers /iottly-device-agent-py-installers

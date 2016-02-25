@@ -1,10 +1,3 @@
 {
-    "IOTTLY_CHUNK_SIZE": 1024,
-    "IOTTLY_REGISTRATION_HOST": "iottlycore:8520",
-    "IOTTLY_REGISTRATION_SERVICE": "/project/56c76368f332fe000da9444b/deviceregistration",
-    "IOTTLY_XMPP_DEVICE_PASSWORD": "4AAAD2D20F3F8522",
-    "IOTTLY_XMPP_DEVICE_USER": "f7167082-ea41-4ad6-b387-eb0136647d19@xmppbroker.localdev.iottly.org",
-    "IOTTLY_XMPP_SERVER_HOST": "xmppbroker",
-    "IOTTLY_XMPP_SERVER_PORT": 5222,
-    "IOTTLY_XMPP_SERVER_USER": "iottlycore@xmppbroker.localdev.iottly.org"
+    "IOTTLY_CHUNK_SIZE": 1024
 }
