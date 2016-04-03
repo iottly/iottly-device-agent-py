@@ -29,7 +29,7 @@ Please refer to [Iottly docker](https://github.com/iottly/iottly-docker) for pre
 - first you need to create a project in Iottly, with board type "Dev Docker Device"; go to [iottly-console](https://github.com/iottly/iottly-console) for instructions on how to create a project
 - after that, `cd iottly`
 - `cd iottly-device-agent-py`
-- `./start_device.sh`
+- `./start_device_unattended.sh /bin/bash`
 - this will:
   - pull the required image from Docker Hub
   - build the device image as per Dockerfile
