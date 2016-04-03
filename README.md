@@ -26,7 +26,8 @@ The agent is also shipped as a Docker container so to simplify the development e
 Please refer to [Iottly docker](https://github.com/iottly/iottly-docker) for prerequisites and full Iottly stack setup.
 
 # Setup and start the device locally in a container:
-- first you need to create a project in Iottly, with board type "Dev Docker Device"; go to [iottly-console](https://github.com/iottly/iottly-console) for instructions on how to create a project
+- first you need to create a project in Iottly, with board type "Dev Docker Device"
+  - see [iottly-console](https://github.com/iottly/iottly-console/blob/master/README.md#iottly-usage) for instructions on how to create a project
 - after that, `cd iottly`
 - `cd iottly-device-agent-py`
 - `./start_device_unattended.sh /bin/bash`
