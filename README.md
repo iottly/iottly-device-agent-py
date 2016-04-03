@@ -17,7 +17,7 @@ limitations under the License.
 # iottly-device-agent-py
 The *iottly-device-agent-py* repo hosts the python agent which is itended to run on devices to enable them to communicate with Iottly.
 
-We are currently running it on Raspberry Pi, and plan to test it on UDOO and WiPy.
+We are currently running it on Raspberry Pi, and plan to test it on UDOO and port it to WiPy (Micro Python).
 
 The agent is also shipped as a Docker container so to simplify the development environment.
 
@@ -26,8 +26,8 @@ The agent is also shipped as a Docker container so to simplify the development e
 Please refer to [Iottly docker](https://github.com/iottly/iottly-docker) for prerequisites and full Iottly stack setup.
 
 # Setup and start the device locally in a container:
-
-- `cd iottly`
+- first you need to create a project in Iottly, with board type "Dev Docker Device"; go to [iottly-console](https://github.com/iottly/iottly-console) for instructions on how to create a project
+- after that, `cd iottly`
 - `cd iottly-device-agent-py`
 - `./start_device.sh`
 - this will:
@@ -35,11 +35,30 @@ Please refer to [Iottly docker](https://github.com/iottly/iottly-docker) for pre
   - build the device image as per Dockerfile
   - start a new container in interactive mode, for development convenience
 - once into the device container console:
-  - `./start.sh` will run the device service
+  - copy/paste the agent install command from the previously created project (devices panel) 
+  - launch the command which will:
+    - download the agent customized installer from your IoT project
+    - register the device
+    - connect the device to Iottly
+    - start an example Loop
+- `Ctrl C` twice to stop the agent
+- `./start.sh` to run it again
 
-You should see `JID set to: raspdev.0001@xmppbroker.localdev.iottly.org` to confirm that the service is running properly.
+On the shell you should see `JID set to: [uuid]@xmppbroker.localdev.iottly.org` to confirm that the service is running properly, and it successfully connected to the Iottly xmpp broker within the development (local) network.
+
+On the Iottly project page you should see:
+- a new row indicating that the device is correctly registered and its parameters
+  - on the devices panel 
+- a green 'led' and the messages produced by the Loop
+  - on the Console panel, after choosing the board
+
+From the Console panel, you can try to send command to the board.
+
+Opening a new shell and repeating the full procedure will start a new device registering it to the project.
 
 # Setup and start the device on a Raspberry Pi:
+
+The device installer for the Raspberry Pi is not released yet. So you will need to follow these steps manually.
 
 ### raspbian jessie LITE
 The following instructions have been tested on the [raspbian jessie LITE](https://downloads.raspberrypi.org/raspbian_lite_latest):   
@@ -81,12 +100,3 @@ The following instructions have been tested on the [raspbian jessie LITE](https:
   - `sudo systemctl start iottly-device-agent.service`
   - to see service logs: `sudo systemctl status iottly-device-agent.service`
 
-
-
-# Configuration
-The device is preconfigured with development parameters:
-- [`settings.py`](https://github.com/iottly/iottly-device-agent-py/blob/master/iottly-device-agent-py/iottly/settings.py)
-
-It tries to connect to the Iottly xmpp broker within the development (local) network.
-
-If you have already started the full stack you should see the green 'led' onto the iottly-console panel.
