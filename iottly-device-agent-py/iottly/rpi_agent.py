@@ -34,18 +34,18 @@ import json
 import threading
 import signal
 import http.client
+import multiprocessing
 
 from iottly import network
 from iottly import loop_worker
 from iottly import rpi_xmpp_broker as rxb
-from iottly import settings
-import multiprocessing
-
+from iottly.settings import settings
+from iottly.flashmanager import FlashManager
 
 logging.basicConfig(level=logging.INFO,
                       format='%(asctime)s [%(levelname)s] (%(processName)-9s) %(message)s',)
 
-settings = settings.Settings()
+
 
 class RPiIottlyAgent(object):
     """
@@ -76,6 +76,8 @@ class RPiIottlyAgent(object):
 
         self.loops = loops
 
+        self.flashmanager = FlashManager(self.send_msg)
+
         self.child_conn, self.parent_conn = multiprocessing.Pipe()
         self.msg_queue = multiprocessing.Queue()
 
@@ -100,7 +102,10 @@ class RPiIottlyAgent(object):
                 json_content = json.loads(msg_string[6:])   
             except ValueError:
                 logging.error("JSON parsing has failed for "+msg_string[6:])
-            if self.message_from_broker:
+            
+            if json_content.get("fw"):
+                self.flashmanager.handle_message(json_content)
+            elif self.message_from_broker:
                 self.message_from_broker(json_content)
 
         else:

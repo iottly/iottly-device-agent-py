@@ -27,10 +27,12 @@ defaults = {
     'IOTTLY_XMPP_SERVER_USER': '',
     'IOTTLY_XMPP_DEVICE_USER': '',
     'IOTTLY_XMPP_DEVICE_PASSWORD': '',
-    'IOTTLY_CHUNK_SIZE': 1024    
+    'IOTTLY_CHUNK_SIZE': 1024,
+    'SECRET_SALT': 'secrect'
 }
 
 
 def Settings():
     return prettysettings.Settings(defaults, './settings.json')
 
+settings = Settings()
