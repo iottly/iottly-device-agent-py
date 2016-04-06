@@ -20,6 +20,7 @@ import prettysettings
 
 defaults = {
 
+    'IOTTLY_PROJECT_ID': '',
     'IOTTLY_REGISTRATION_HOST': '',
     'IOTTLY_REGISTRATION_SERVICE': '',
     'IOTTLY_XMPP_SERVER_HOST': '',
@@ -28,7 +29,7 @@ defaults = {
     'IOTTLY_XMPP_DEVICE_USER': '',
     'IOTTLY_XMPP_DEVICE_PASSWORD': '',
     'IOTTLY_CHUNK_SIZE': 1024,
-    'SECRET_SALT': 'secrect'
+    'IOTTLY_SECRET_SALT': ''
 }
 
 

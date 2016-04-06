@@ -25,7 +25,7 @@ class FlashManager(object):
         logging.info('flashmanager: {}'.format(str(msg)))
         if msg.get('fw'):
             fw = msg['fw']
-            if fw.get('startupgrading') == "1":
+            if fw.get('startupgrading') == 1:
                 self.init_upgrade(msg)
             else:
                 self.receive_chunk(msg)
@@ -37,7 +37,7 @@ class FlashManager(object):
             'fw.qty': self.chunks_desired,
             'fw.dim': int(settings.IOTTLY_CHUNK_SIZE/self.chunks_desired),
             'fw.file': self.file,
-            'fw.projectid': self.projectid
+            'fw.projectid': settings.IOTTLY_PROJECT_ID
         }
 
     def init_upgrade(self, msg):
@@ -70,11 +70,16 @@ class FlashManager(object):
 
     def dump_file(self):
         content = b''.join(map(base64.b64decode, self.chunks))
-        real_content = content
-        while len(content) % 1024:
+        real_content = content[:]
+        logging.info('real_content: {}'.format(len(real_content)))
+
+        while len(content) % settings.IOTTLY_CHUNK_SIZE:
             content += chr(0xFF)
 
-        content += bytearray(settings.SECRET_SALT,'utf-8')
+        content += bytearray(settings.IOTTLY_SECRET_SALT,'utf-8')
+
+        logging.info('content: {}'.format(len(content)))
+
         file_md5 = md5(content).hexdigest()
         with open(self.file, 'wb') as f:
             f.write(real_content)
