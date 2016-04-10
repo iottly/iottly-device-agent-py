@@ -28,7 +28,7 @@ Classes:
 
 """
 
-
+import os
 import logging
 import json
 import threading
@@ -153,7 +153,9 @@ class RPiIottlyAgent(object):
 
         """
 
-        
+        #create uploadfirmware dir:
+        if not os.path.exists(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR):
+            os.makedirs(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR)
 
         try:
             self.broker_process = rxb.init(

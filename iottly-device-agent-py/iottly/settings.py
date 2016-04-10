@@ -29,7 +29,8 @@ defaults = {
     'IOTTLY_XMPP_DEVICE_USER': '',
     'IOTTLY_XMPP_DEVICE_PASSWORD': '',
     'IOTTLY_CHUNK_SIZE': 1024,
-    'IOTTLY_SECRET_SALT': ''
+    'IOTTLY_SECRET_SALT': '',
+    'IOTTLY_USERPACKAGE_UPLOAD_DIR': '/var/iottly-agent/userpackageuploads'
 }
 
 

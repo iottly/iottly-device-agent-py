@@ -22,6 +22,10 @@ import logging
 
 from iottly import rpi_agent
 
+try:
+    import userpackage
+except Exception as e:
+    logging.info(e)
 
 def main():
 

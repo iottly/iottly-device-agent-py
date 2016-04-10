@@ -14,7 +14,7 @@
 # limitations under the License.
 # 
 
-FROM ubuntu:latest
+FROM ubuntu:15.10
 MAINTAINER iottly
 
 RUN apt-get update -y

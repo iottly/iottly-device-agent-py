@@ -78,12 +78,15 @@ class FlashManager(object):
 
         content += bytearray(settings.IOTTLY_SECRET_SALT,'utf-8')
 
-        logging.info('content: {}'.format(len(content)))
+        logging.info('Content length: {}'.format(len(content)))
 
         file_md5 = md5(content).hexdigest()
-        with open(self.file, 'wb') as f:
-            f.write(real_content)
-
         logging.info("Expected MD5: {}".format(self.md5))
         logging.info("File MD5: {}".format(file_md5))
+        if (file_md5 == self.md5):
+            logging.info('md5 check passed! Save file.')
+            
+            with open(os.path.join(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR, self.file), 'wb') as f:
+                f.write(real_content)
+
 
