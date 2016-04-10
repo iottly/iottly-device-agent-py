@@ -10,7 +10,7 @@ from iottly.settings import settings
 get_chunks = Command('Request chunks', 'Ask Iottly for some chunks', '/json {"fw":{"area":0,"block":0,"qty":0,"dim":0}}')
 
 class FlashManager(object):
-    def __init__(self, send_msg):
+    def __init__(self, send_msg, close_func):
         self.chunks_received = 0
         self.last_block = -1
         self.chunks_desired = 4
@@ -20,6 +20,7 @@ class FlashManager(object):
         self.projectid = None
         self.chunks = []
         self.send_msg = send_msg
+        self.close_func = close_func
 
     def handle_message(self, msg):
         logging.info('flashmanager: {}'.format(str(msg)))
@@ -89,4 +90,5 @@ class FlashManager(object):
             with open(os.path.join(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR, self.file), 'wb') as f:
                 f.write(real_content)
 
-
+            logging.info('Closing agent to restart.')
+            self.close_func()

@@ -76,7 +76,7 @@ class RPiIottlyAgent(object):
 
         self.loops = loops
 
-        self.flashmanager = FlashManager(self.send_msg)
+        self.flashmanager = FlashManager(self.send_msg, self.close)
 
         self.child_conn, self.parent_conn = multiprocessing.Pipe()
         self.msg_queue = multiprocessing.Queue()
