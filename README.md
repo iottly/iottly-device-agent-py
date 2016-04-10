@@ -39,6 +39,7 @@ Please refer to [Iottly docker](https://github.com/iottly/iottly-docker) for pre
   - copy/paste the agent install command from the previously created project (devices panel) 
   - launch the command which will:
     - download the agent customized installer from your IoT project
+    - check and install newly available firmware in `/var/iottly-agent/userpackageuploads`
     - register the device
     - connect the device to Iottly
     - start an example Loop
@@ -56,6 +57,14 @@ On the Iottly project page you should see:
 From the Console panel, you can try to send command to the board.
 
 Opening a new shell and repeating the full procedure will start a new device registering it to the project.
+
+## Flashing a new firmware into the Dev Docker Device
+You can flash a new firmware from the Device Code panel in [iottly-console](https://github.com/iottly/iottly-console/blob/master/README.md#iottly-usage).
+
+A part from the fact that the agent will stop after receiving a new firmware and you need to restart it manually (with `./start.sh`), the feature works as if it was a physical device.
+
+In physical devices the agent run as a service, with respawn, so it will automatically restart as soon as it is stopped.
+
 
 # Setup and start the device on a Raspberry Pi:
 
