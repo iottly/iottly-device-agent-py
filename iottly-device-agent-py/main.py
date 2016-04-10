@@ -16,58 +16,99 @@ limitations under the License.
 
 """
 
-import time
+import importlib
+import time, datetime, os
 import json
 import logging
+from multiprocessing import current_process
 
+from iottly import iottlyagent
 from iottly import rpi_agent
 
+
+
+udfw = None
+startupmessagelist = []
 try:
-    import userpackage
+    udfw = importlib.import_module('userpackage.userdefinedfw')
+    fwdatetime = datetime.datetime.fromtimestamp(os.path.getmtime(udfw.__file__))
+    logging.info('Found fw: {}'.format(fwdatetime))
+    startupmessagelist.append({
+        'process': 
+            {
+                'name': current_process().name, 
+                'status': {'started': 'loaded firmware: {}'.format(fwdatetime)}
+            }
+        })
+    
 except Exception as e:
     logging.info(e)
+    startupmessagelist.append({
+        'process': 
+            {
+                'name': current_process().name, 
+                'status': {'error': '{}. You may consider flashing a firmware.'.format(str(e))}
+            }
+        })
 
 def main():
 
+    loops = []
 
-    #define as many loop functions
-    #loop functions are being runned in an infinite loop
-    def loop1():
-        logging.info('loop1')
-
-        #a = 1/0
-        #msg is a dictionary (json):
-        msg = {"timerevent": {"loop1message":1}}
-
-        agent.send_msg(msg)
-        time.sleep(1)
-
-    def loop2():
-        logging.info('loop2')
-
-        #msg is a dictionary (json):
-        msg = {"timerevent": {"loop1message":2}}
-
-        agent.send_msg(msg)
-        time.sleep(1)
-
+    # if any, add the loop function from the user package
+    if udfw:
+        if hasattr(udfw, 'loop'):
+            loops.append(udfw.loop)
+        else:
+            startupmessagelist.append({
+                'process': 
+                    {
+                        'name': current_process().name, 
+                        'status': {'warning': 'No loop function found in userdefinedfw. Are you sure you don\'t want a loop function?'}
+                    }
+                })            
 
     #define the callback to receive messages from broker:
     def new_message(msg):
         #received message is a dictionary
         logging.info(msg)
-        agent.send_msg(msg)
-        if "ECHO" in msg.keys():
-            agent.close()
+        if udfw:
+            usermethodname = next(iter(msg.keys()))
+            if hasattr(udfw, usermethodname):
+                try:
+                    getattr(udfw, usermethodname)(msg)
+                except Exception as e:
+                    agent.send_msg({
+                        'process': 
+                            {
+                                'name': current_process().name, 
+                                'status': {'error': '{}. Oops this seems an error in your \'{}\' code'.format(str(e), usermethodname)}
+                            }
+                        })
+            else:
+                agent.send_msg({
+                'process': 
+                    {
+                        'name': current_process().name, 
+                        'status': {'warning': 'No handler found for cmd userdefinedfw. You may consider flashing your new firwmare.'},
+                        'cmd': msg
+                    }
+                })
+
 
 
 
     #instantiate the agent passing:
     # - the message callback
     # - a list with the loop functions
-    #agent = rpi_agent.RPiIottlyAgent(new_message, [loop1])
-    agent = rpi_agent.RPiIottlyAgent(new_message, [])
+    agent = rpi_agent.RPiIottlyAgent(new_message, loops)
+    agentwrapper = iottlyagent.IottlyAgentWrapper(agent)
 
+    # prepare startupmessages to be sent
+    for msg in startupmessagelist:
+        agent.send_msg(msg)
+
+    # start the agent (blocking)
     agent.start()
 
 

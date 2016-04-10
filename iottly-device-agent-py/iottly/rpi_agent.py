@@ -158,6 +158,8 @@ class RPiIottlyAgent(object):
             os.makedirs(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR)
 
         try:
+            logging.info('msg_queue: {}'.format(self.msg_queue.qsize()))
+
             self.broker_process = rxb.init(
                 (settings.IOTTLY_XMPP_SERVER_HOST, settings.IOTTLY_XMPP_SERVER_PORT),
                 settings.IOTTLY_XMPP_DEVICE_USER + '/IB', 
@@ -213,6 +215,11 @@ class RPiIottlyAgent(object):
                 lw.kill()
 
         logging.info("Closing Agent")
+        closemsg = {'process': {
+                        'name': multiprocessing.current_process().name, 
+                        'status': 'closed'}}
+                        
+        self.msg_queue.put(dict(to=settings.IOTTLY_XMPP_SERVER_USER,msg='/json ' + json.dumps(closemsg)))
         self.msg_queue.put(None)
         if self.broker_process:
             self.broker_process.join()

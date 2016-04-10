@@ -91,7 +91,8 @@ def message_consumer(xmpp_server, jid, password, handle_message, msg_queue, chil
             
 
     except Exception as e:
-        logging.info(e)
+        logging.info('msg_queue: {}'.format(msg_queue.qsize()))
+        logging.error(e)
         child_conn.send(PARAMERROR)
         
 
