@@ -1,0 +1,52 @@
+#!/bin/bash
+
+### fix locale
+sudo locale-gen
+export LANGUAGE='en_GB'
+export LC_ALL="en_GB.UTF-8" 
+sudo update-locale en_GB.UTF-8
+
+#sudo sed -i '/^#.* en_US\.UTF-8 /s/^#//' /etc/locale.gen
+#sudo update-locale en_US.UTF-8
+#echo 'LANGUAGE=en_US:en' | sudo tee --append /etc/default/locale 
+#echo 'LC_ALL=en_US.UTF-8' | sudo tee --append /etc/default/locale 
+
+
+### update upgrade:
+sudo apt-get -y update
+sudo apt-get -y upgrade
+
+### install python3.4
+sudo apt-get -y install python3.4 python3.4-dev git
+
+### install pip:
+wget https://bootstrap.pypa.io/get-pip.py
+sudo python3.4 get-pip.py
+
+### install RPi.GPIO:
+### this is just in case you want to have fun playing with GPIOs from the internet!
+sudo pip3.4 install RPi.GPIO
+
+### clone iottly-device-agent-py repo:
+export IOTTLYDIR=iottly-device-agent-py
+if ! [ -d $HOME/$IOTTLYDIR ]; then
+  git clone https://github.com/iottly/$IOTTLYDIR.git $HOME
+else
+  git -C $HOME/$IOTTLYDIR pull
+fi
+
+### install iottly requirements:
+pwd
+sudo pip3.4 install -r $HOME/$IOTTLYDIR/requirements.txt
+
+### install service:
+export IOTTLYSERVICE=iottly-device-agent.service
+sudo cp ./$IOTTLYSERVICE /lib/systemd/system/$IOTTLYSERVICE
+sudo chmod 644 /lib/systemd/system/$IOTTLYSERVICE
+sudo systemctl daemon-reload
+sudo systemctl enable $IOTTLYSERVICE
+
+### run service:
+sudo systemctl start $IOTTLYSERVICE
+#to see service logs: sudo systemctl status iottly-device-agent.service
+
