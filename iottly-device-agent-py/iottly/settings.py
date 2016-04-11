@@ -36,6 +36,6 @@ defaults = {
 
 def Settings():
     agentpath, filename = os.path.split(sys.argv[0])
-    return prettysettings.Settings(defaults, os.path.join('settings.json'))
+    return prettysettings.Settings(defaults, os.path.join(agentpath, 'settings.json'))
 
 settings = Settings()
