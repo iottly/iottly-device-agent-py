@@ -1,0 +1,8 @@
+sudo systemctl stop iottly-device-agent.service 
+sudo systemctl disable iottly-device-agent.service 
+sudo rm /lib/systemd/system/iottly-device-agent.service 
+sudo systemctl daemon-reload 
+sudo systemctl reset-failed 
+
+cd $HOME
+sudo rm -rf iottly-device-agent-py/

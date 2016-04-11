@@ -16,7 +16,7 @@ limitations under the License.
 
 """
 
-import prettysettings
+import sys, prettysettings, os
 
 defaults = {
 
@@ -35,6 +35,7 @@ defaults = {
 
 
 def Settings():
-    return prettysettings.Settings(defaults, './settings.json')
+    agentpath, filename = os.path.split(sys.argv[0])
+    return prettysettings.Settings(defaults, os.path.join('settings.json'))
 
 settings = Settings()

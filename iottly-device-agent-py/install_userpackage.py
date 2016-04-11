@@ -15,12 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 """
-import os, shutil, logging, tarfile
+import os, shutil, logging, tarfile, sys
 
 from iottly.settings import settings
 
 logging.basicConfig(level=logging.INFO,
                       format='%(asctime)s [%(levelname)s] (%(processName)-9s) %(message)s',)
+
+
+agentpath, filename = os.path.split(sys.argv[0])
 
 userpackagepath = 'userpackage/'
 
@@ -56,7 +59,7 @@ if fwfilename:
         # untar new fw into proper destination
         logging.info('Extracting archive ...')
         with tarfile.open(fwfilename) as tar:
-            tar.extractall()
+            tar.extractall(agentpath)
         logging.info('Installation successful!')
     except Exception as e:
         logging.error(e)
