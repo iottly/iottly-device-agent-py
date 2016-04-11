@@ -46,7 +46,7 @@ cp $PROJID-iottlyagentinstaller.bsx $CDIR/$REPODIR
 cd $CDIR
 
 #echo $TMPDIR
-#rm -rf $TMPDIR
+rm -rf $TMPDIR
 
 
 echo "$PROJID-iottlyagentinstaller.bsx created"
