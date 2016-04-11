@@ -1,23 +1,34 @@
 #!/bin/bash
 
 #### courtesy Linux Journal http://www.linuxjournal.com/node/1005818
-
+echo $0
 echo ""
 echo "Self Extracting Installer"
 echo ""
 
+# allow execution from piping into bash, example: wget -O - URL | bash
+if [ "$0" == "bash" ]; then
+    MYSELF=`mktemp /tmp/iottlydownload.XXXXXX`
+    cat /proc/$$/fd/0 > $MYSELF
+    chmod +x $MYSELF
+    $MYSELF
+    exit 0
+fi
+
 export TMPDIR=`mktemp -d /tmp/iottlyagentinstaller.XXXXXX`
 
 ARCHIVE=`awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }' $0`
-
-tail -n+$ARCHIVE $0 | tar xzv -C $TMPDIR
 echo $ARCHIVE
+tail -n+$ARCHIVE $0 | tar xzv -C $TMPDIR
+
 CDIR=`pwd`
 cd $TMPDIR
+chmod +x installer
 ./installer
 
 cd $CDIR
 rm -rf $TMPDIR
+rm -- $0
 
 exit 0
 

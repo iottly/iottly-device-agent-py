@@ -29,7 +29,12 @@ userpackagepath = 'userpackage/'
 
 # check if a new fw is available
 logging.info('Searching for firmware archive in {} ...'.format(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR))
-fws = os.listdir(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR)
+if os.path.exists(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR):
+    fws = os.listdir(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR)
+else:
+    logging.info('No firmware dir found. Exiting installer ...')
+    quit()
+
 fwfilename = None
 
 if len(fws) > 1:

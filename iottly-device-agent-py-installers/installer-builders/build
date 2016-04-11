@@ -13,15 +13,22 @@ export TMPDIR=`mktemp -d /tmp/iottlyagentinstaller.$PROJID.XXXXXX`
 export PAYLOAD=$PROJID-payload
 export PAYLOADTEMPDIR=$TMPDIR/$PAYLOAD
 
+echo $IOTTLY_REGISTRATION_HOST
+echo $IOTTLY_REGISTRATION_SERVICE
+
+
 CDIR=`pwd`
 
-cp -ar $BOARDDIR/payload/ $TMPDIR
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+
+cp -ar $SCRIPTDIR/$BOARDDIR/payload/ $TMPDIR
 
 cd $TMPDIR/payload
 
 if [ -e "start.sh" ]; then
-    sed -i "s/{IOTTLY_REGISTRATION_HOST}/$IOTTLY_REGISTRATION_HOST/g" start.sh
-    sed -i "s/{IOTTLY_REGISTRATION_SERVICE}/$IOTTLY_REGISTRATION_SERVICE/g" start.sh
+    sed -i "s,{IOTTLY_REGISTRATION_HOST},$IOTTLY_REGISTRATION_HOST,g" start.sh
+    sed -i "s,{IOTTLY_REGISTRATION_SERVICE},$IOTTLY_REGISTRATION_SERVICE,g" start.sh
 fi
 
 tar cf $PAYLOADTEMPDIR.tar ./*
@@ -31,7 +38,7 @@ if [ -e "$PAYLOAD.tar" ]; then
     gzip $PAYLOAD.tar
 
     if [ -e "$PAYLOAD.tar.gz" ]; then
-        cat $CDIR/decompress $PAYLOAD.tar.gz > $PROJID-iottlyagentinstaller.bsx
+        cat $SCRIPTDIR/decompress $PAYLOAD.tar.gz > $PROJID-iottlyagentinstaller.bsx
     else
         echo "payload.tar.gz does not exist"
         exit 1
@@ -41,7 +48,7 @@ else
     exit 1
 fi
 
-cp $PROJID-iottlyagentinstaller.bsx $CDIR/$REPODIR
+cp $PROJID-iottlyagentinstaller.bsx $SCRIPTDIR/$REPODIR
 
 cd $CDIR
 
