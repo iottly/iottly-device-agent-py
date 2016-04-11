@@ -1,0 +1,4 @@
+cp ./start.sh /iottly-device-agent-py/iottly-device-agent-py/.
+
+cd /iottly-device-agent-py/iottly-device-agent-py
+./start.sh

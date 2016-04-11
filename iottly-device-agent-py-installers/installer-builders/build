@@ -1,0 +1,53 @@
+#!/bin/bash
+
+#### courtesy Linux Journal http://www.linuxjournal.com/node/1005818
+export BOARDDIR=$1
+export PROJID=$2
+
+export IOTTLY_REGISTRATION_HOST=$3
+export IOTTLY_REGISTRATION_SERVICE=$4
+
+export REPODIR=../installer-project-repos
+
+export TMPDIR=`mktemp -d /tmp/iottlyagentinstaller.$PROJID.XXXXXX`
+export PAYLOAD=$PROJID-payload
+export PAYLOADTEMPDIR=$TMPDIR/$PAYLOAD
+
+CDIR=`pwd`
+
+cp -ar $BOARDDIR/payload/ $TMPDIR
+
+cd $TMPDIR/payload
+
+if [ -e "start.sh" ]; then
+    sed -i "s/{IOTTLY_REGISTRATION_HOST}/$IOTTLY_REGISTRATION_HOST/g" start.sh
+    sed -i "s/{IOTTLY_REGISTRATION_SERVICE}/$IOTTLY_REGISTRATION_SERVICE/g" start.sh
+fi
+
+tar cf $PAYLOADTEMPDIR.tar ./*
+cd $TMPDIR
+
+if [ -e "$PAYLOAD.tar" ]; then
+    gzip $PAYLOAD.tar
+
+    if [ -e "$PAYLOAD.tar.gz" ]; then
+        cat $CDIR/decompress $PAYLOAD.tar.gz > $PROJID-iottlyagentinstaller.bsx
+    else
+        echo "payload.tar.gz does not exist"
+        exit 1
+    fi
+else
+    echo "payload.tar does not exist"
+    exit 1
+fi
+
+cp $PROJID-iottlyagentinstaller.bsx $CDIR/$REPODIR
+
+cd $CDIR
+
+#echo $TMPDIR
+#rm -rf $TMPDIR
+
+
+echo "$PROJID-iottlyagentinstaller.bsx created"
+exit 0

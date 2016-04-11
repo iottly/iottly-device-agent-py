@@ -1,7 +1,5 @@
 export IOTTLY_REGISTRATION_HOST={IOTTLY_REGISTRATION_HOST}
 export IOTTLY_REGISTRATION_SERVICE={IOTTLY_REGISTRATION_SERVICE}
 
-
-cd /iottly-device-agent-py/iottly-device-agent-py
-
-./start.sh
+python3.4 install_userpackage.py
+python3.4 main.py
