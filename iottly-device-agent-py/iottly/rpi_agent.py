@@ -43,7 +43,7 @@ from iottly.settings import settings
 from iottly.flashmanager import FlashManager
 
 logging.basicConfig(level=logging.INFO,
-                      format='%(asctime)s [%(levelname)s] (%(processName)-9s) %(message)s',)
+                      format='%(asctime)s [%(levelname)s] (%(processName)-11s - %(process)d) %(message)s',)
 
 
 
@@ -117,9 +117,14 @@ class RPiIottlyAgent(object):
             #start loops thread
             for l in self.loops:
                 lw = loop_worker.LoopWorker(loop_func=l, send_msg=self.send_msg)
-                lw.start()            
+                lw.start()
+            
+            return True
+
         elif status == rxb.NOROUTETOHOST:
             self.close()
+            return False
+
         elif status == rxb.PARAMERROR:
             logging.info('Ask for params to {}'.format(settings.IOTTLY_REGISTRATION_SERVICE))
 
@@ -141,6 +146,8 @@ class RPiIottlyAgent(object):
             except Exception as e:
                 logging.info(e)
                 logging.info('Error retrieving params from IOTTLY')            
+
+            return False
             
 
     def start(self):
@@ -170,12 +177,13 @@ class RPiIottlyAgent(object):
         except:
             self.child_conn.send(rxb.PARAMERROR)
 
-        self.connectionstatuschanged(self.parent_conn.recv())
-
-        if multiprocessing.current_process().name == 'MainProcess':
-            # this is the blocking action on which the main process waits forever
-            if self.parent_conn.recv() == "close":
-                self._close()
+        # start can call itself resulting in multiple execution waiting for recv() == "close"
+        # filter only the execution which produced the "CONNECTED" state
+        if self.connectionstatuschanged(self.parent_conn.recv()):
+            if multiprocessing.current_process().name == 'MainProcess':
+                # this is the blocking action on which the main process waits forever
+                if self.parent_conn.recv() == "close":
+                    self._close()
         
 
     def send_msg(self, msg):
@@ -225,7 +233,4 @@ class RPiIottlyAgent(object):
             self.broker_process.join()
         logging.info("Agent closed")
 
-    def restart(self):
-        self.close()
-        self.start()
 
