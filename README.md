@@ -43,7 +43,7 @@ Please refer to [Iottly docker](https://github.com/iottly/iottly-docker) for pre
     - register the device
     - connect the device to Iottly
     - start an example Loop
-- `Ctrl C` twice to stop the agent
+- `Ctrl C` to stop the agent
 - `./start.sh` to run it again
 
 On the shell you should see `JID set to: [uuid]@xmppbroker.localdev.iottly.org` to confirm that the service is running properly, and it successfully connected to the Iottly xmpp broker within the development (local) network.
