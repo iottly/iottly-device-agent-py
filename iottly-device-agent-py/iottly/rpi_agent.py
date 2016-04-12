@@ -35,6 +35,7 @@ import threading
 import signal
 import http.client
 import multiprocessing
+import time
 
 from iottly import network
 from iottly import loop_worker
@@ -122,7 +123,8 @@ class RPiIottlyAgent(object):
             return True
 
         elif status == rxb.NOROUTETOHOST:
-            self.close()
+            time.sleep(30)
+            self.start()
             return False
 
         elif status == rxb.PARAMERROR:
