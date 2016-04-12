@@ -44,8 +44,17 @@ class LoopWorker(Process):
             except Exception as ex:
                 #FIXME: add here debug message to be sent to iottly-core
                 logging.error(ex)
-                self.send_msg({'process': {'name': self.name, 'status': {'error': str(ex)}}})
+                self.send_msg({
+                    'process': 
+                        {
+                            'name': self.name, 
+                            'function': self.name,
+                            'status': {'error': '{}'.format(str(ex))},
+                            'description': 'Oops this seems an error in your \'{}\' code'.format(self.name)
+                        }
+                    })                
                 self.kill()
+
         logging.info(' exiting')
 
 

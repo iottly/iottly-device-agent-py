@@ -113,7 +113,7 @@ class RPiIottlyAgent(object):
             logging.info("bad message: %s" % msg)
 
 
-    def connectionstatuschanged(self, status):
+    def connectionstatuschanged(self, status, prestartmessages):
         if status == rxb.CONNECTED:
             #start loops thread
             for l in self.loops:
@@ -144,7 +144,7 @@ class RPiIottlyAgent(object):
                     raise Exception(response['error'])
 
                 settings.update(response)
-                self.start()
+                self.start(prestartmessages)
             except Exception as e:
                 logging.info(e)
                 logging.info('Error retrieving params from IOTTLY')            
@@ -152,7 +152,7 @@ class RPiIottlyAgent(object):
             return False
             
 
-    def start(self):
+    def start(self, prestartmessages):
         """
 
         starts the AGENT
@@ -181,7 +181,11 @@ class RPiIottlyAgent(object):
 
         # start can call itself resulting in multiple execution waiting for recv() == "close"
         # filter only the execution which produced the "CONNECTED" state
-        if self.connectionstatuschanged(self.parent_conn.recv()):
+        if self.connectionstatuschanged(self.parent_conn.recv(), prestartmessages):
+            if prestartmessages:
+                for msg in prestartmessages:
+                    self.send_msg(msg)
+                    
             if multiprocessing.current_process().name == 'MainProcess':
                 # this is the blocking action on which the main process waits forever
                 if self.parent_conn.recv() == "close":
