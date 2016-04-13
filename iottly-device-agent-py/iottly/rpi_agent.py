@@ -137,7 +137,13 @@ class RPiIottlyAgent(object):
                     connection = http.client.HTTPConnection(settings.IOTTLY_REGISTRATION_HOST)
                 else:
                     logging.info('HTTPS connection')
-                    connection = http.client.HTTPSConnection(host=settings.IOTTLY_REGISTRATION_HOST, context=ssl._create_unverified_context())
+                    #python 3.4.3 changed default for unverified
+                    try:
+                        context = ssl._create_unverified_context()
+                    except:
+                        context = None
+                        
+                    connection = http.client.HTTPSConnection(host=settings.IOTTLY_REGISTRATION_HOST, context=context)
 
                 reg_url = '{}/{}'.format(settings.IOTTLY_REGISTRATION_SERVICE, mac)
                 logging.info(reg_url)
