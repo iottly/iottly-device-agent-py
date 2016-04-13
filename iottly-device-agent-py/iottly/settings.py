@@ -21,6 +21,7 @@ import sys, prettysettings, os
 defaults = {
 
     'IOTTLY_PROJECT_ID': '',
+    'IOTTLY_REGISTRATION_PROTOCOL': '',    
     'IOTTLY_REGISTRATION_HOST': '',
     'IOTTLY_REGISTRATION_SERVICE': '',
     'IOTTLY_XMPP_SERVER_HOST': '',

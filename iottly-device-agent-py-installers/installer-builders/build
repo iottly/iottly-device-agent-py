@@ -6,6 +6,7 @@ export PROJID=$2
 
 export IOTTLY_REGISTRATION_HOST=$3
 export IOTTLY_REGISTRATION_SERVICE=$4
+export IOTTLY_REGISTRATION_PROTOCOL=$5
 
 export REPODIR=../installer-project-repos
 
@@ -27,6 +28,7 @@ cp -ar $SCRIPTDIR/$BOARDDIR/payload/ $TMPDIR
 cd $TMPDIR/payload
 
 if [ -e "start.sh" ]; then
+    sed -i "s,{IOTTLY_REGISTRATION_PROTOCOL},$IOTTLY_REGISTRATION_PROTOCOL,g" start.sh
     sed -i "s,{IOTTLY_REGISTRATION_HOST},$IOTTLY_REGISTRATION_HOST,g" start.sh
     sed -i "s,{IOTTLY_REGISTRATION_SERVICE},$IOTTLY_REGISTRATION_SERVICE,g" start.sh
 fi

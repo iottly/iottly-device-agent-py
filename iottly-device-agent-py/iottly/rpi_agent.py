@@ -33,7 +33,7 @@ import logging
 import json
 import threading
 import signal
-import http.client
+import http.client, ssl
 import multiprocessing
 import time
 
@@ -133,7 +133,11 @@ class RPiIottlyAgent(object):
             try:
                 mac = network.getHwAddr('eth0')
                 logging.info('device mac: {}'.format(mac))
-                connection = http.client.HTTPConnection(settings.IOTTLY_REGISTRATION_HOST)
+                if settings.IOTTLY_REGISTRATION_PROTOCOL == 'http':
+                    connection = http.client.HTTPConnection(settings.IOTTLY_REGISTRATION_HOST)
+                else:
+                    logging.info('HTTPS connection')
+                    connection = http.client.HTTPSConnection(host=settings.IOTTLY_REGISTRATION_HOST, context=ssl._create_unverified_context())
 
                 reg_url = '{}/{}'.format(settings.IOTTLY_REGISTRATION_SERVICE, mac)
                 logging.info(reg_url)
