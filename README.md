@@ -67,8 +67,6 @@ In physical devices the agent run as a service, with respawn, so it will automat
 
 # Setup and start the device on a Raspberry Pi:
 
-The device installer for the Raspberry Pi is not released yet. So you will need to follow these steps manually.
-
 ### raspbian jessie LITE
 The following instructions have been tested on the [raspbian jessie LITE](https://downloads.raspberrypi.org/raspbian_lite_latest):   
   - to flash image onto RPi SD card: [sd-and-micro-sd-management-with-linux-dd](http://tomorrowdata.io/2015/10/24/sd-and-micro-sd-management-with-linux-dd/)
