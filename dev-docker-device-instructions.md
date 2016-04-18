@@ -1,7 +1,9 @@
 # Setup and start a virtual device locally in a container
-1. clone this repo: `git clone https://github.com/iottly/iottly-device-agent-py.git`
-2. `cd iottly-device-agent-py`
-3. `./start_device_unattended.sh /bin/bash`
+1. if you don't already have it on your machine, you need to install Docker:
+  - instructions here: http://docs.docker.com/engine/installation/
+2. clone this repo: `git clone https://github.com/iottly/iottly-device-agent-py.git`
+3. `cd iottly-device-agent-py`
+4. `./start_device_unattended.sh /bin/bash`
   - this will:
     - pull the required image from Docker Hub
     - build the device image as per Dockerfile
@@ -27,7 +29,7 @@ On the Iottly project page you should see:
 Repeating the steps from 
 From the Console panel, you can try to send command to the board.
 
-Opening a new shell and repeating the procedure from step 3  will start a new device registering it to the project.
+Opening a new shell and repeating the procedure from step 4 will start a new device registering it to the project.
 
 ## Flashing a new firmware into the Dev Docker Device
 You can flash a new firmware into the virtual device as it would be a physical one.
