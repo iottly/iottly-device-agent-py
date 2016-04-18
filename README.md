@@ -72,7 +72,8 @@ The following instructions have been tested on the [raspbian jessie LITE](https:
   - to flash image onto RPi SD card: [sd-and-micro-sd-management-with-linux-dd](http://tomorrowdata.io/2015/10/24/sd-and-micro-sd-management-with-linux-dd/)
 
 ### ssh into RPi (default user and password):
-  - to find your RPi's IP: `sudo arp-scan 192.168.1.0/24` (if you are on a small network ...)
+  - to find your RPi's IP: `sudo arp-scan [your local network]`
+  - `[your local network]` can be for example: `192.168.1.0/24`
   - `ssh pi@[your RPi's IP]`
 
 ### once into the RPi console:
