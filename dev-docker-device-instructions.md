@@ -1,5 +1,5 @@
 # Setup and start a virtual device locally in a container
-1. if you don't already have it on your machine, you need to install Docker:
+1. if you don't already have it on your machine, you need to install Docker (> 1.10.2):
   - instructions here: http://docs.docker.com/engine/installation/
 2. clone this repo: `git clone https://github.com/iottly/iottly-device-agent-py.git`
 3. `cd iottly-device-agent-py`
