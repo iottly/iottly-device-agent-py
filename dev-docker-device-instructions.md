@@ -27,7 +27,7 @@ On the Iottly project page you should see:
 Repeating the steps from 
 From the Console panel, you can try to send command to the board.
 
-Opening a new shell and repeating the full procedure will start a new device registering it to the project.
+Opening a new shell and repeating the procedure from step 3  will start a new device registering it to the project.
 
 ## Flashing a new firmware into the Dev Docker Device
 You can flash a new firmware into the virtual device as it would be a physical one.
@@ -36,5 +36,3 @@ The only difference is that the agent will stop after receiving a new firmware a
 
 In physical devices the agent run as a service, with respawn, so it will automatically restart as soon as it is stopped.
 
-# Running other virtual devices
-Repeat from step 3.
