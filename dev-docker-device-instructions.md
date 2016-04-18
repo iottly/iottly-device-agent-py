@@ -1,20 +1,20 @@
-# Setup and start a virtual device locally in a container:
-- clone this repo: `git clone https://github.com/iottly/iottly-device-agent-py.git`
-- `cd iottly-device-agent-py`
-- `./start_device_unattended.sh /bin/bash`
-- this will:
-  - pull the required image from Docker Hub
-  - build the device image as per Dockerfile
-  - start a new container in interactive mode, for development convenience
-- once into the device container console:
-  - copy/paste the agent install command from the previously created project (devices panel) 
-  - launch the command which will:
-    - download the agent installer customized from your IoT project
-    - check and install newly available firmware in `/var/iottly-agent/userpackageuploads`
-    - register the device
-    - connect the device to Iottly
-- `Ctrl C` to stop the agent
-- `./start.sh` to run it again
+# Setup and start a virtual device locally in a container
+1. clone this repo: `git clone https://github.com/iottly/iottly-device-agent-py.git`
+2. `cd iottly-device-agent-py`
+3. `./start_device_unattended.sh /bin/bash`
+  - this will:
+    - pull the required image from Docker Hub
+    - build the device image as per Dockerfile
+    - start a new container in interactive mode, for development convenience
+  - once into the device container console:
+    - copy/paste the agent install command from the previously created project (devices panel) 
+    - launch the command which will:
+      - download the agent installer customized from your IoT project
+      - check and install newly available firmware in `/var/iottly-agent/userpackageuploads`
+      - register the device
+      - connect the device to Iottly
+    - `Ctrl C` to stop the agent
+    - `./start.sh` to run it again
 
 On the shell you should see `JID set to: [uuid]@demobrober.iottly.org` to confirm that the service is running properly, and it successfully connected to the Iottly xmpp broker within the development (local) network.
 
@@ -24,6 +24,7 @@ On the Iottly project page you should see:
 - a green 'led' and the messages produced by the Loop
   - on the Console panel, after choosing the board
 
+Repeating the steps from 
 From the Console panel, you can try to send command to the board.
 
 Opening a new shell and repeating the full procedure will start a new device registering it to the project.
