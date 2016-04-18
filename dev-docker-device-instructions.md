@@ -35,3 +35,6 @@ You can flash a new firmware into the virtual device as it would be a physical o
 The only difference is that the agent will stop after receiving a new firmware and you need to restart it manually (with `./start.sh`).
 
 In physical devices the agent run as a service, with respawn, so it will automatically restart as soon as it is stopped.
+
+# Running other virtual devices
+Repeat from step 3.
