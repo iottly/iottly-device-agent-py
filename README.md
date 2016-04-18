@@ -38,11 +38,10 @@ Please refer to [Iottly docker](https://github.com/iottly/iottly-docker) for pre
 - once into the device container console:
   - copy/paste the agent install command from the previously created project (devices panel) 
   - launch the command which will:
-    - download the agent customized installer from your IoT project
+    - download the agent installer customized from your IoT project
     - check and install newly available firmware in `/var/iottly-agent/userpackageuploads`
     - register the device
     - connect the device to Iottly
-    - start an example Loop
 - `Ctrl C` to stop the agent
 - `./start.sh` to run it again
 
@@ -76,37 +75,15 @@ The following instructions have been tested on the [raspbian jessie LITE](https:
 
 ### ssh into RPi (default user and password):
   - to find your RPi's IP: `sudo arp-scan 192.168.1.0/24` (if you are on a small network ...)
-  - `ssh pi@[your RPi's IP]
+  - `ssh pi@[your RPi's IP]`
 
-### install python3.4
-  - `sudo apt-get install python3.4`
+### once into the RPi console:
+  - copy/paste the agent install command from the previously created project (devices panel in Iottly) 
+  - launch the command which will:
+    - download the agent installer customized from your IoT project
+    - check and install newly available firmware in `/var/iottly-agent/userpackageuploads`
+    - register the device
+    - connect the device to Iottly
 
-### install pip:
-  - `wget https://bootstrap.pypa.io/get-pip.py`
-  - `sudo python3.4 get-pip.py`
-
-### install python-dev (for GPIO build purposes)
-  - `sudo apt-get install python3.4-dev`
-
-### install RPi.GPIO:
-  - this is just in case you want to have fun playing with GPIOs from the internet!
-  - `sudo pip3.4 install RPi.GPIO`
-
-
-### install git
-  - `sudo apt-get install git`
-
-### clone iottly-device-agent-py repo:
-  - `git clone https://github.com/iottly/iottly-device-agent-py.git`
-  - `cd iottly-device-agent-py/iottly-device-agent-py` (yes, twice)
-
-### install iottly requirements:
-  - `sudo pip3.4 install -r requirements.txt`
-
-### install service:
-  - `./install-service.sh`
-
-### run service:
-  - `sudo systemctl start iottly-device-agent.service`
-  - to see service logs: `sudo systemctl status iottly-device-agent.service`
-
+### to look at service logs: 
+  - `sudo systemctl status iottly-device-agent.service`
