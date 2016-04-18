@@ -7,6 +7,7 @@ Anyway, it should work out of the box on the standard "desktop" image too.
 
 ### power on the Raspberry Pi
   - ...
+
 ### connect it to your local network
   - LAN, or
   - WiFi (instructions [here](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md))
