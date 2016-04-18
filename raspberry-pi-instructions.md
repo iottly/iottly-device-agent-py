@@ -5,7 +5,7 @@ The agent have been tested on the [raspbian jessie LITE](https://downloads.raspb
   - to flash image onto RPi SD card: [sd-and-micro-sd-management-with-linux-dd](http://tomorrowdata.io/2015/10/24/sd-and-micro-sd-management-with-linux-dd/)
 Anyway, it should work out of the box on the standard "desktop" image too.
 
-### power on the Raspberry Pi
+### power up the board
   - ...
 
 ### connect it to your local network
