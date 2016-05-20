@@ -18,7 +18,9 @@ sudo apt-get -y update
 sudo apt-get -y upgrade
 
 ### install python3.4
-sudo apt-get -y install python3.4 python3.4-dev git
+sudo apt-get -y install python3.4 python3.4-dev git python3-smbus
+
+#enable I2C http://www.raspberry-projects.com/pi/pi-operating-systems/raspbian/io-pins-raspbian/i2c-pins
 
 ### install pip:
 PIPPATH=`which pip3.4`
