@@ -39,7 +39,8 @@ import time
 
 from iottly import network
 from iottly import loop_worker
-from iottly import rpi_xmpp_broker as rxb
+from iottly import rpi_xmpp_client as rxb
+from iottly import rpi_mqtt_client as rmb
 from iottly.settings import settings
 from iottly.flashmanager import FlashManager
 
@@ -176,18 +177,33 @@ class RPiIottlyAgent(object):
         if not os.path.exists(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR):
             os.makedirs(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR)
 
-        try:
-            logging.info('msg_queue: {}'.format(self.msg_queue.qsize()))
+        if (settings.IOTTLY_IOT_PROTOCOL=="xmpp"):
+            logging.info('settings.IOTTLY_IOT_PROTOCOL {}'.format(settings.IOTTLY_IOT_PROTOCOL))
+            try:    
+                logging.info('msg_queue: {}'.format(self.msg_queue.qsize()))
+                self.broker_process = rxb.init(
+                    (settings.IOTTLY_XMPP_SERVER_HOST, settings.IOTTLY_XMPP_SERVER_PORT),
+                    settings.IOTTLY_XMPP_DEVICE_USER + '/IB', 
+                    settings.IOTTLY_XMPP_DEVICE_PASSWORD, 
+                    self.handle_message, 
+                    self.msg_queue, self.child_conn)
+            except:
+                self.child_conn.send(rxb.PARAMERROR)
 
-            self.broker_process = rxb.init(
-                (settings.IOTTLY_XMPP_SERVER_HOST, settings.IOTTLY_XMPP_SERVER_PORT),
-                settings.IOTTLY_XMPP_DEVICE_USER + '/IB', 
-                settings.IOTTLY_XMPP_DEVICE_PASSWORD, 
-                self.handle_message, 
-                self.msg_queue, self.child_conn)
-
-        except:
-            self.child_conn.send(rxb.PARAMERROR)
+        elif (settings.IOTTLY_IOT_PROTOCOL=="mqtt"):
+            logging.info('settings.IOTTLY_IOT_PROTOCOL {}'.format(settings.IOTTLY_IOT_PROTOCOL))
+            try:    
+                logging.info('msg_queue: {}'.format(self.msg_queue.qsize()))
+                self.broker_process = rmb.init(
+                    settings.IOTTLY_MQTT_SERVER_HOST, settings.IOTTLY_MQTT_SERVER_PORT,
+                    settings.IOTTLY_MQTT_DEVICE_USER, 
+                    settings.IOTTLY_MQTT_DEVICE_PASSWORD,
+                    settings.IOTTLY_MQTT_TOPIC_SUBSCRIBE,
+                    settings.IOTTLY_MQTT_TOPIC_PUBLISH,
+                    self.handle_message, 
+                    self.msg_queue, self.child_conn)
+            except:
+                self.child_conn.send(rmb.PARAMERROR)
 
         # start can call itself resulting in multiple execution waiting for recv() == "close"
         # filter only the execution which produced the "CONNECTED" state

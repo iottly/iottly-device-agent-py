@@ -31,7 +31,14 @@ defaults = {
     'IOTTLY_XMPP_DEVICE_PASSWORD': '',
     'IOTTLY_CHUNK_SIZE': 1024,
     'IOTTLY_SECRET_SALT': '',
-    'IOTTLY_USERPACKAGE_UPLOAD_DIR': '/var/iottly-agent/userpackageuploads'
+    'IOTTLY_USERPACKAGE_UPLOAD_DIR': '/var/iottly-agent/userpackageuploads',
+    'IOTTLY_IOT_PROTOCOL':'',
+    'IOTTLY_MQTT_SERVER_HOST':'',
+    'IOTTLY_MQTT_SERVER_PORT': 0,
+    'IOTTLY_MQTT_DEVICE_USER':'',
+    'IOTTLY_MQTT_DEVICE_PASSWORD':'',
+    'IOTTLY_MQTT_TOPIC_SUBSCRIBE':'',
+    'IOTTLY_MQTT_TOPIC_PUBLISH':''
 }
 
 
