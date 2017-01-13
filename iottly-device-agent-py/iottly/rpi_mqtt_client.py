@@ -38,12 +38,12 @@ class RpiIottlyMqttClient(mqtt.Client):
         self.verify_connection=connection_status_changed
 
     def handle_message (self, paho_mqtt, userdata, msg):
-        print ("arriva")
-        logging.info('New Message Received {}'.format("topic: "+str(msg.topic)+"\tpayload: "+str(msg.payload)))
         messg = {
-            'topic': (str(msg.topic)),
-            'msg': (str(msg.payload))
+            #'msg': (str(msg.payload)),
+            'msg': msg.payload.decode('UTF-8'),
+            'topic': msg.topic
         }
+
         self.message_from_broker(messg)
 
 

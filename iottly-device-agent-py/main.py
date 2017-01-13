@@ -86,25 +86,46 @@ def main():
     def new_message(msg):
         #received message is a dictionary
         logging.info(msg)
-        usermethodname = next(iter(msg.keys()))
-    
-        if checkfunction(usermethodname, agent.send_msg, {'receivedcmd': msg}):
-            try:
-                getattr(udfw, usermethodname)(msg)
-            except Exception as e:
+        try:
+            usermethodname = next(iter(msg.keys()))
+            if len(msg.keys())<2:            
+                if checkfunction(usermethodname, agent.send_msg, {'receivedcmd': msg}):
+                    try:
+                        getattr(udfw, usermethodname)(msg)
+                    except Exception as e:
+                        agent.send_msg({
+                            'process': 
+                                {
+                                    'name': current_process().name, 
+                                    'function': usermethodname,
+                                    'status': {'error': '{}'.format(str(e))},
+                                    'description': 'Oops this seems an error in your \'{}\' code'.format(usermethodname),
+                                    'cmd': msg                                
+                                }
+                            })
+            else:
                 agent.send_msg({
                     'process': 
                         {
                             'name': current_process().name, 
-                            'function': usermethodname,
-                            'status': {'error': '{}'.format(str(e))},
-                            'description': 'Oops this seems an error in your \'{}\' code'.format(usermethodname),
+                            'function': 'undefined',
+                            'status': {'error': 'Too many methods defined'},
+                            'description': 'Found JSON with more than 1 root key',
                             'cmd': msg                                
                         }
                     })
 
-
-
+        except StopIteration as e:
+            agent.send_msg({
+                'process': 
+                    {
+                        'name': current_process().name, 
+                        'function': 'undefined',
+                        'status': {'error': '{}'.format(str(e))},
+                        'description': 'No method name found in message',
+                        'cmd': msg                                
+                    }
+                })
 
     #instantiate the agent passing:
     # - the message callback
