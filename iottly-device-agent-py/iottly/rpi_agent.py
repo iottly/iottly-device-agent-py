@@ -125,7 +125,7 @@ class RPiIottlyAgent(object):
 
         elif status == rxb.NOROUTETOHOST:
             time.sleep(30)
-            self.start()
+            self.start(prestartmessages)
             return False
 
         elif status == rxb.PARAMERROR:

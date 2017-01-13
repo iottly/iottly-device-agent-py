@@ -29,13 +29,13 @@ NOROUTETOHOST = 'NoRouteToHost'
 PARAMERROR = 'ParamError'
 
 class RpiIottlyMqttClient(mqtt.Client):
-    def __init__(self,cl_id,pswd,message_from_broker,connection_status_changed):
+    def __init__(self,cl_id,pswd,message_from_broker,on_connect,on_disconnect):
         mqtt.Client.__init__(self,client_id=cl_id, clean_session=True, userdata=None)
         self.username_pw_set(cl_id, password=pswd)
-        self.on_connect=connection_status_changed
+        self.on_connect=on_connect
         self.on_message=self.handle_message
+        self.on_disconnect=on_disconnect
         self.message_from_broker=message_from_broker
-        self.verify_connection=connection_status_changed
 
     def handle_message (self, paho_mqtt, userdata, msg):
         messg = {
@@ -50,18 +50,28 @@ class RpiIottlyMqttClient(mqtt.Client):
 # This function runs in its own process and dispatches messages in the shared queue
 def message_consumer(mqtt_server, mqtt_port, mqtt_user, pswd, sub_tpc, pub_tpc, handle_message, msg_queue, child_conn):
 
-    def connection_status_changed(client, userdata, flags, connection_status_code):
+    def on_connect(client, userdata, flags, connection_status_code):
         logging.info('Connection to message broker STATUS - result code {}'.format(str(connection_status_code)))
-        if (connection_status_code!=0):
-            logging.info("no connection to %s" % str(mqtt_server))
+        if (connection_status_code==mqtt.MQTT_ERR_SUCCESS):
+            logging.info("connected to %s" % str(mqtt_server))
+            mqtt_c.subscribe(sub_tpc,2)
+        else:
+            logging.info("connection error to %s" % str(mqtt_server))
             child_conn.send(NOROUTETOHOST)
 
-    try:
-        mqtt_c = RpiIottlyMqttClient(mqtt_user, pswd, handle_message, connection_status_changed)
+    def on_disconnect(client, userdata, connection_status_code):
+        logging.info('Disonnection from message broker STATUS - result code {}'.format(str(connection_status_code)))
+        if (connection_status_code==mqtt.MQTT_ERR_SUCCESS):
+            logging.info('Disconnected by user')
+        else:
+            logging.info("lost connection from %s" % str(mqtt_server))
 
-        # Connect to the XMPP server and start processing XMPP stanzas.
+    try:
+        mqtt_c = RpiIottlyMqttClient(mqtt_user, pswd, handle_message, on_connect, on_disconnect)
+
+        # Connect to the MQTT broker.
         mqtt_c.connect(mqtt_server,mqtt_port,60)
-        mqtt_c.subscribe(sub_tpc,2)
+        # mqtt_c.subscribe(sub_tpc,2)
         mqtt_c.loop_start()
         child_conn.send(CONNECTED)
 
@@ -73,6 +83,10 @@ def message_consumer(mqtt_server, mqtt_port, mqtt_user, pswd, sub_tpc, pub_tpc, 
                 mqtt_c.disconnect()
                 break
             mqtt_c.publish(pub_tpc,msg_obj['msg'],2)
+
+    except ConnectionRefusedError as e:
+        logging.info("no connection to %s" % str(mqtt_server))
+        child_conn.send(NOROUTETOHOST)
 
     except Exception as e:
         logging.info('msg_queue: {}'.format(msg_queue.qsize()))
