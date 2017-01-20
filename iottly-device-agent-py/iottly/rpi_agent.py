@@ -177,6 +177,9 @@ class RPiIottlyAgent(object):
         if not os.path.exists(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR):
             os.makedirs(settings.IOTTLY_USERPACKAGE_UPLOAD_DIR)
 
+        logging.info('settings iot protocol: {}'.format(settings.IOTTLY_IOT_PROTOCOL))
+
+
         if (settings.IOTTLY_IOT_PROTOCOL=="xmpp"):
             logging.info('settings.IOTTLY_IOT_PROTOCOL {}'.format(settings.IOTTLY_IOT_PROTOCOL))
             try:    
@@ -204,6 +207,9 @@ class RPiIottlyAgent(object):
                     self.msg_queue, self.child_conn)
             except:
                 self.child_conn.send(rmb.PARAMERROR)
+
+        else:
+            self.child_conn.send(rmb.PARAMERROR)
 
         # start can call itself resulting in multiple execution waiting for recv() == "close"
         # filter only the execution which produced the "CONNECTED" state
