@@ -180,7 +180,7 @@ class RPiIottlyAgent(object):
         logging.info('settings iot protocol: {}'.format(settings.IOTTLY_IOT_PROTOCOL))
 
 
-        if (settings.IOTTLY_IOT_PROTOCOL=="xmpp"):
+        if (settings.IOTTLY_IOT_PROTOCOL=="XMPP"):
             logging.info('settings.IOTTLY_IOT_PROTOCOL {}'.format(settings.IOTTLY_IOT_PROTOCOL))
             try:    
                 logging.info('msg_queue: {}'.format(self.msg_queue.qsize()))
@@ -193,7 +193,7 @@ class RPiIottlyAgent(object):
             except:
                 self.child_conn.send(rxb.PARAMERROR)
 
-        elif (settings.IOTTLY_IOT_PROTOCOL=="mqtt"):
+        elif (settings.IOTTLY_IOT_PROTOCOL=="MQTT"):
             logging.info('settings.IOTTLY_IOT_PROTOCOL {}'.format(settings.IOTTLY_IOT_PROTOCOL))
             try:    
                 logging.info('msg_queue: {}'.format(self.msg_queue.qsize()))
