@@ -1,3 +1,5 @@
+# http://stackoverflow.com/questions/12498304/using-bash-to-display-a-progress-working-indicator
+
 cp ./start.sh /iottly-device-agent-py/iottly-device-agent-py/.
 
 cd /iottly-device-agent-py/iottly-device-agent-py
